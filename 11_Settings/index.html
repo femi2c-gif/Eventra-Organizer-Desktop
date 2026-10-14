@@ -1,0 +1,409 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#091d33">
+  <title>Eventra | Organizer Settings</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            navy: "#091D33",
+            eventra: "#6D28FF",
+            "eventra-light": "#F1ECFF",
+            canvas: "#F4F7FC"
+          },
+          fontFamily: {
+            sans: ["Inter", "Arial", "sans-serif"]
+          }
+        }
+      }
+    };
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: Inter, Arial, sans-serif;
+      font-style: normal;
+      background: #F4F7FC;
+      color: #10213A;
+    }
+    button, input, select, textarea { font: inherit; }
+    button, a { -webkit-tap-highlight-color: transparent; }
+    .sidebar-scroll::-webkit-scrollbar { width: 5px; }
+    .sidebar-scroll::-webkit-scrollbar-thumb {
+      background: #344760;
+      border-radius: 20px;
+    }
+    .field {
+      width: 100%;
+      min-height: 46px;
+      border: 1px solid #DCE4F0;
+      border-radius: 12px;
+      background: #F8FAFF;
+      padding: 11px 13px;
+      color: #10213A;
+      outline: none;
+      transition: border-color .2s, box-shadow .2s;
+    }
+    .field:focus {
+      border-color: #6D28FF;
+      box-shadow: 0 0 0 3px rgb(109 40 255 / 12%);
+      background: #fff;
+    }
+    .field:disabled { opacity: .7; cursor: not-allowed; }
+    .setting-nav {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      width: 100%;
+      border-radius: 12px;
+      padding: 12px 14px;
+      text-align: left;
+      color: #475569;
+      font-size: 15px;
+      font-weight: 500;
+      transition: background .2s, color .2s;
+    }
+    .setting-nav:hover { background: #F4F0FF; color: #6D28FF; }
+    .setting-nav.active { background: #F1ECFF; color: #6D28FF; font-weight: 700; }
+    .switch {
+      position: relative;
+      display: inline-flex;
+      width: 48px;
+      height: 28px;
+      flex-shrink: 0;
+      align-items: center;
+      border-radius: 999px;
+      background: #CBD5E1;
+      transition: background .2s;
+      cursor: pointer;
+    }
+    .switch::after {
+      content: "";
+      position: absolute;
+      left: 3px;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: white;
+      box-shadow: 0 1px 4px #0002;
+      transition: transform .2s;
+    }
+    .switch input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+    .switch:has(input:checked) { background: #6D28FF; }
+    .switch:has(input:checked)::after { transform: translateX(20px); }
+    .switch:focus-within { outline: 3px solid rgb(109 40 255 / 20%); }
+    .settings-section[hidden] { display: none !important; }
+    #toast { transition: opacity .2s, transform .2s; }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; }
+    }
+  </style>
+
+  <!-- Eventra shared organizer layout alignment -->
+  <link rel="stylesheet" href="../shared/eventra-shell.css">
+</head>
+
+<body class="min-h-screen" data-eventra-nav="settings">
+<script src="../shared/eventra-shell.js"></script>
+  <!-- Mobile drawer overlay -->
+  
+  <!-- Sidebar -->
+  
+  <!-- Main content -->
+  <main class="min-h-screen w-full">
+    <!-- Header -->
+    
+    <div class="mx-auto w-full max-w-[1500px] px-4 pb-10 pt-6 sm:px-6 lg:px-7 lg:pt-8">
+      <!-- Page heading -->
+      <section class="mb-7 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+        <div class="min-w-0">
+          <div class="mb-3 inline-flex items-center gap-2 rounded-full bg-[#EEE8FF] px-3 py-1.5 text-[13px] font-semibold text-eventra">
+            <span class="h-2 w-2 rounded-full bg-eventra"></span> ACCOUNT MANAGEMENT
+          </div>
+          <h2 class="text-[30px] font-extrabold leading-tight tracking-tight text-navy sm:text-[36px]">
+            Settings
+          </h2>
+          <p class="mt-2 max-w-2xl text-[15px] leading-6 text-slate-600">
+            Manage your organizer profile, security, notifications, and portal preferences.
+          </p>
+        </div>
+        <div class="flex flex-wrap gap-3">
+          <button id="resetChangesButton" type="button"
+            class="inline-flex min-h-[46px] items-center justify-center rounded-xl border border-slate-200 bg-white px-5 py-3 text-[14px] font-semibold text-slate-700 transition hover:bg-slate-50">
+            Reset Changes
+          </button>
+          <button id="saveChangesButton" type="button"
+            class="inline-flex min-h-[46px] items-center justify-center gap-2 rounded-xl bg-eventra px-5 py-3 text-[14px] font-bold text-white shadow-lg shadow-purple-200 transition hover:bg-purple-700 focus:outline-none focus:ring-4 focus:ring-purple-200">
+            <span aria-hidden="true">✓</span> Save Changes
+          </button>
+        </div>
+      </section>
+
+      <!-- Main settings layout -->
+      <div class="grid grid-cols-1 items-start gap-6 xl:grid-cols-[270px_minmax(0,1fr)]">
+        <!-- Settings menu -->
+        <aside class="rounded-2xl border border-slate-100 bg-white p-4 shadow-sm">
+          <p class="mb-3 px-3 text-[13px] font-bold uppercase tracking-wide text-slate-400">Settings Menu</p>
+          <nav id="settingsNavigation" class="grid grid-cols-2 gap-2 sm:grid-cols-3 xl:grid-cols-1" aria-label="Settings sections">
+            <button class="setting-nav active" type="button" data-section="profile" aria-current="page">
+              <span class="text-xl">♙</span><span>Profile Details</span>
+            </button>
+            <button class="setting-nav" type="button" data-section="security">
+              <span class="text-xl">♙</span><span>Security</span>
+            </button>
+            <button class="setting-nav" type="button" data-section="notifications">
+              <span class="text-xl">♧</span><span>Notifications</span>
+            </button>
+            <button class="setting-nav" type="button" data-section="appearance">
+              <span class="text-xl">◐</span><span>Appearance</span>
+            </button>
+          </nav>
+
+          <div class="mt-5 rounded-xl bg-[#F6F3FF] p-4">
+            <div class="mb-2 flex h-10 w-10 items-center justify-center rounded-xl bg-white text-xl text-eventra">ⓘ</div>
+            <h3 class="text-[15px] font-bold text-navy">Need help?</h3>
+            <p class="mt-1 text-[14px] leading-5 text-slate-600">Get assistance with your organizer account and portal settings.</p>
+            <button id="contactSupportButton" type="button"
+              class="mt-3 text-[14px] font-bold text-eventra hover:underline">Contact support →</button>
+          </div>
+        </aside>
+
+        <!-- Settings sections -->
+        <div class="min-w-0 space-y-6">
+          <!-- Profile -->
+          <section id="section-profile" class="settings-section overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm">
+            <div class="border-b border-slate-100 px-5 py-5 sm:px-7">
+              <h3 class="text-[20px] font-bold text-navy sm:text-[22px]">Profile Details</h3>
+              <p class="mt-1 text-[15px] leading-6 text-slate-500">Update the information associated with your organizer account.</p>
+            </div>
+
+            <form id="profileForm" class="space-y-6 p-5 sm:p-7">
+              <div class="flex flex-col gap-4 border-b border-slate-100 pb-6 sm:flex-row sm:items-center">
+                <div id="avatarPreview" class="flex h-[76px] w-[76px] shrink-0 items-center justify-center rounded-2xl bg-eventra text-3xl font-bold text-white">O</div>
+                <div class="min-w-0 flex-1">
+                  <h4 id="profileDisplayName" class="text-[17px] font-bold text-navy">Organizer Account</h4>
+                  <p class="mt-1 text-[14px] text-slate-500">Profile information shown in your organizer portal.</p>
+                  <div class="mt-3 flex flex-wrap gap-3">
+                    <label class="inline-flex min-h-[40px] cursor-pointer items-center justify-center rounded-lg border border-slate-200 px-4 py-2 text-[14px] font-semibold text-slate-700 hover:bg-slate-50">
+                      Upload photo
+                      <input id="avatarUpload" type="file" accept="image/png,image/jpeg,image/webp" class="sr-only">
+                    </label>
+                    <button id="removeAvatarButton" type="button" class="min-h-[40px] px-2 text-[14px] font-semibold text-rose-600 hover:underline">Remove</button>
+                  </div>
+                  <p class="mt-2 text-[13px] text-slate-500">PNG, JPG, or WebP. Maximum 3MB. Preview only; no upload service is connected here.</p>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-1 gap-5 sm:grid-cols-2">
+                <label class="block">
+                  <span class="mb-2 block text-[14px] font-semibold text-slate-700">First name</span>
+                  <input id="firstName" name="firstName" class="field" type="text" autocomplete="given-name" placeholder="First name" maxlength="80">
+                </label>
+                <label class="block">
+                  <span class="mb-2 block text-[14px] font-semibold text-slate-700">Last name</span>
+                  <input id="lastName" name="lastName" class="field" type="text" autocomplete="family-name" placeholder="Last name" maxlength="80">
+                </label>
+                <label class="block">
+                  <span class="mb-2 block text-[14px] font-semibold text-slate-700">Email address</span>
+                  <input id="email" name="email" class="field" type="email" autocomplete="email" placeholder="you@example.com" maxlength="160">
+                </label>
+                <label class="block">
+                  <span class="mb-2 block text-[14px] font-semibold text-slate-700">Phone number</span>
+                  <input id="phone" name="phone" class="field" type="tel" autocomplete="tel" placeholder="+234 800 000 0000" maxlength="30">
+                </label>
+                <label class="block sm:col-span-2">
+                  <span class="mb-2 block text-[14px] font-semibold text-slate-700">Organization name</span>
+                  <input id="organizationName" name="organizationName" class="field" type="text" placeholder="Your organization or business" maxlength="120">
+                </label>
+                <label class="block sm:col-span-2">
+                  <span class="mb-2 block text-[14px] font-semibold text-slate-700">About your organization</span>
+                  <textarea id="organizationBio" name="organizationBio" class="field min-h-[110px] resize-y" rows="4" maxlength="500" placeholder="Tell attendees a little about your organization."></textarea>
+                  <span class="mt-1 block text-right text-[13px] text-slate-500"><span id="bioCounter">0</span>/500</span>
+                </label>
+              </div>
+              <div class="flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 pt-5">
+                <p class="text-[14px] text-slate-500">Changes are saved when you select Save Changes.</p>
+                <button type="submit" class="min-h-[44px] rounded-xl bg-eventra px-5 py-3 text-[14px] font-bold text-white hover:bg-purple-700">Save Profile</button>
+              </div>
+            </form>
+          </section>
+
+          <!-- Security -->
+          <section id="section-security" class="settings-section hidden overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm" hidden>
+            <div class="border-b border-slate-100 px-5 py-5 sm:px-7">
+              <h3 class="text-[20px] font-bold text-navy sm:text-[22px]">Security</h3>
+              <p class="mt-1 text-[15px] leading-6 text-slate-500">Manage your password and account protection preferences.</p>
+            </div>
+            <div class="space-y-6 p-5 sm:p-7">
+              <div class="flex flex-col gap-4 rounded-xl border border-slate-100 p-4 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <h4 class="text-[16px] font-bold text-navy">Password</h4>
+                  <p class="mt-1 text-[14px] leading-5 text-slate-500">Change your password to help keep your account secure.</p>
+                </div>
+                <button id="showPasswordFormButton" type="button" class="min-h-[42px] shrink-0 rounded-xl border border-slate-200 px-4 py-2 text-[14px] font-semibold text-slate-700 hover:bg-slate-50">Change password</button>
+              </div>
+
+              <form id="passwordForm" class="hidden space-y-4 rounded-xl bg-slate-50 p-4 sm:p-5" hidden>
+                <h4 class="text-[16px] font-bold text-navy">Change password</h4>
+                <label class="block">
+                  <span class="mb-2 block text-[14px] font-semibold text-slate-700">Current password</span>
+                  <input id="currentPassword" class="field" type="password" autocomplete="current-password" required minlength="8">
+                </label>
+                <label class="block">
+                  <span class="mb-2 block text-[14px] font-semibold text-slate-700">New password</span>
+                  <input id="newPassword" class="field" type="password" autocomplete="new-password" required minlength="8">
+                  <span class="mt-1 block text-[13px] text-slate-500">Use at least 8 characters.</span>
+                </label>
+                <label class="block">
+                  <span class="mb-2 block text-[14px] font-semibold text-slate-700">Confirm new password</span>
+                  <input id="confirmPassword" class="field" type="password" autocomplete="new-password" required minlength="8">
+                </label>
+                <div class="flex flex-wrap gap-3">
+                  <button type="submit" class="min-h-[44px] rounded-xl bg-eventra px-5 py-3 text-[14px] font-bold text-white hover:bg-purple-700">Update password</button>
+                  <button id="cancelPasswordButton" type="button" class="min-h-[44px] rounded-xl border border-slate-200 px-5 py-3 text-[14px] font-semibold text-slate-700 hover:bg-white">Cancel</button>
+                </div>
+              </form>
+
+              <div class="flex flex-col gap-3 rounded-xl border border-slate-100 p-4 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <h4 class="text-[16px] font-bold text-navy">Two-factor authentication</h4>
+                  <p class="mt-1 text-[14px] leading-5 text-slate-500">Add another verification step when signing in.</p>
+                  <p class="mt-2 text-[13px] text-amber-700">Availability depends on your account's authentication provider.</p>
+                </div>
+                <span class="inline-flex min-h-[34px] shrink-0 items-center justify-center self-start rounded-full bg-slate-100 px-3 py-1 text-[13px] font-semibold text-slate-600 sm:self-center">Provider dependent</span>
+              </div>
+
+              <div class="rounded-xl border border-rose-100 bg-rose-50/60 p-4 sm:p-5">
+                <h4 class="text-[16px] font-bold text-rose-700">Sign out</h4>
+                <p class="mt-1 text-[14px] leading-5 text-slate-600">End your organizer session on this device.</p>
+                <button id="signOutButton" type="button" class="mt-4 min-h-[42px] rounded-xl border border-rose-200 bg-white px-4 py-2 text-[14px] font-semibold text-rose-700 hover:bg-rose-50">Sign out</button>
+              </div>
+            </div>
+          </section>
+
+          <!-- Notifications -->
+          <section id="section-notifications" class="settings-section hidden overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm" hidden>
+            <div class="border-b border-slate-100 px-5 py-5 sm:px-7">
+              <h3 class="text-[20px] font-bold text-navy sm:text-[22px]">Notification Preferences</h3>
+              <p class="mt-1 text-[15px] leading-6 text-slate-500">Choose which updates you want to receive in this browser.</p>
+            </div>
+            <div class="divide-y divide-slate-100 px-5 sm:px-7">
+              <div class="flex items-start justify-between gap-4 py-5">
+                <div class="min-w-0">
+                  <h4 class="text-[15px] font-semibold text-navy">Event updates</h4>
+                  <p class="mt-1 text-[14px] leading-5 text-slate-500">Changes to event status, schedules, or publication.</p>
+                </div>
+                <label class="switch" aria-label="Event updates"><input id="notifyEvents" type="checkbox" checked><span class="sr-only">Event updates</span></label>
+              </div>
+              <div class="flex items-start justify-between gap-4 py-5">
+                <div class="min-w-0">
+                  <h4 class="text-[15px] font-semibold text-navy">Ticket sales</h4>
+                  <p class="mt-1 text-[14px] leading-5 text-slate-500">New bookings, sales milestones, and ticket activity.</p>
+                </div>
+                <label class="switch" aria-label="Ticket sales"><input id="notifySales" type="checkbox" checked><span class="sr-only">Ticket sales</span></label>
+              </div>
+              <div class="flex items-start justify-between gap-4 py-5">
+                <div class="min-w-0">
+                  <h4 class="text-[15px] font-semibold text-navy">Attendee activity</h4>
+                  <p class="mt-1 text-[14px] leading-5 text-slate-500">Important attendee and check-in updates.</p>
+                </div>
+                <label class="switch" aria-label="Attendee activity"><input id="notifyAttendees" type="checkbox" checked><span class="sr-only">Attendee activity</span></label>
+              </div>
+              <div class="flex items-start justify-between gap-4 py-5">
+                <div class="min-w-0">
+                  <h4 class="text-[15px] font-semibold text-navy">Product news and tips</h4>
+                  <p class="mt-1 text-[14px] leading-5 text-slate-500">Occasional Eventra product news and organizer guidance.</p>
+                </div>
+                <label class="switch" aria-label="Product news"><input id="notifyNews" type="checkbox"><span class="sr-only">Product news and tips</span></label>
+              </div>
+            </div>
+            <div class="border-t border-slate-100 px-5 py-5 sm:px-7">
+              <button id="saveNotificationsButton" type="button" class="min-h-[44px] rounded-xl bg-eventra px-5 py-3 text-[14px] font-bold text-white hover:bg-purple-700">Save notification preferences</button>
+              <p class="mt-3 text-[13px] leading-5 text-slate-500">These switches store preferences in this browser. They do not change server-side email subscriptions.</p>
+            </div>
+          </section>
+
+          <!-- Appearance -->
+          <section id="section-appearance" class="settings-section hidden overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm" hidden>
+            <div class="border-b border-slate-100 px-5 py-5 sm:px-7">
+              <h3 class="text-[20px] font-bold text-navy sm:text-[22px]">Appearance</h3>
+              <p class="mt-1 text-[15px] leading-6 text-slate-500">Choose how the organizer portal looks on this device.</p>
+            </div>
+            <div class="space-y-6 p-5 sm:p-7">
+              <div>
+                <h4 class="text-[16px] font-bold text-navy">Theme</h4>
+                <p class="mt-1 text-[14px] text-slate-500">Select the theme used by this settings page.</p>
+                <div class="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
+                  <label class="cursor-pointer rounded-xl border-2 border-eventra bg-white p-4">
+                    <input type="radio" name="theme" value="light" class="mr-2 accent-violet-600" checked>
+                    <span class="text-[15px] font-semibold text-navy">Light</span>
+                    <div class="mt-3 h-16 rounded-lg border border-slate-200 bg-slate-50 p-2">
+                      <div class="h-2 w-1/2 rounded bg-slate-300"></div>
+                      <div class="mt-2 h-7 rounded bg-white"></div>
+                    </div>
+                  </label>
+                  <label class="cursor-pointer rounded-xl border border-slate-200 bg-white p-4 hover:border-violet-300">
+                    <input type="radio" name="theme" value="dark" class="mr-2 accent-violet-600">
+                    <span class="text-[15px] font-semibold text-navy">Dark preview</span>
+                    <div class="mt-3 h-16 rounded-lg bg-slate-900 p-2">
+                      <div class="h-2 w-1/2 rounded bg-slate-600"></div>
+                      <div class="mt-2 h-7 rounded bg-slate-800"></div>
+                    </div>
+                  </label>
+                </div>
+                <p class="mt-3 text-[13px] leading-5 text-slate-500">Dark theme selection is saved, but this screen retains the approved light Eventra theme.</p>
+              </div>
+
+              <div class="border-t border-slate-100 pt-5">
+                <h4 class="text-[16px] font-bold text-navy">Text size</h4>
+                <p class="mt-1 text-[14px] text-slate-500">Choose a comfortable text size for this page.</p>
+                <select id="textSize" class="field mt-3 max-w-sm">
+                  <option value="normal">Standard</option>
+                  <option value="large">Large</option>
+                </select>
+              </div>
+              <button id="saveAppearanceButton" type="button" class="min-h-[44px] rounded-xl bg-eventra px-5 py-3 text-[14px] font-bold text-white hover:bg-purple-700">Save appearance</button>
+            </div>
+          </section>
+
+          <footer class="py-3 text-center text-[13px] text-slate-500">
+            Eventra Organizer Portal · Manage your events with confidence.
+          </footer>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Toast -->
+  <div id="toast" role="status" aria-live="polite"
+    class="pointer-events-none fixed bottom-5 left-1/2 z-[100] w-[calc(100%-32px)] max-w-[440px] -translate-x-1/2 translate-y-3 rounded-xl bg-navy px-5 py-4 text-white opacity-0 shadow-2xl">
+    <p id="toastTitle" class="text-[14px] font-bold">Eventra</p>
+    <p id="toastMessage" class="mt-1 text-[14px] leading-5 text-slate-200">Settings updated.</p>
+  </div>
+
+  <script src="./script.js"></script>
+
+  <script>
+    (function () {
+      const logout = document.getElementById('settingsLogoutButton');
+      if (logout) logout.addEventListener('click', function () {
+        try { sessionStorage.clear(); } catch (_) {}
+        window.location.href = '../01_Sign%20In/index.html';
+      });
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,2947 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Organizer Portal | Eventra</title>
+
+    <!-- Google Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link
+        rel="preconnect"
+        href="https://fonts.gstatic.com"
+        crossorigin
+    >
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+        rel="stylesheet"
+    >
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        eventraPurple: "#6D28FF",
+                        eventraNavy: "#081B31",
+                        eventraText: "#10213A",
+                        eventraBg: "#F5F7FC"
+                    }
+                }
+            }
+        };
+    </script>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            min-height: 100%;
+            overflow-x: hidden;
+            overflow-y: auto;
+            background: #f5f7fc;
+            color: #10213a;
+        }
+
+        html,
+        body,
+        body *,
+        button,
+        input,
+        select,
+        textarea {
+            font-family:
+                "Inter",
+                Arial,
+                Helvetica,
+                sans-serif !important;
+
+            font-style: normal !important;
+        }
+
+        body {
+            font-weight: 400;
+        }
+
+        button {
+            cursor: pointer;
+        }
+
+        img {
+            max-width: 100%;
+        }
+
+        /* ================================
+           DESKTOP SIDEBAR
+        ================================= */
+
+        .sidebar {
+            width: 250px;
+        }
+
+        .main-content {
+            margin-left: 250px;
+            min-height: 100vh;
+            overflow: visible;
+        }
+
+        .sidebar-link {
+            transition:
+                background 0.2s ease,
+                color 0.2s ease;
+        }
+
+        .sidebar-link:hover:not(.active) {
+            background: rgba(255, 255, 255, 0.07);
+            color: #ffffff;
+        }
+
+        .sidebar-link.active {
+            background: #6d28ff;
+            color: #ffffff;
+
+            box-shadow:
+                0 7px 18px rgba(109, 40, 255, 0.24);
+        }
+
+        /* ================================
+           CARDS
+        ================================= */
+
+        .stat-card,
+        .dashboard-card,
+        .events-card {
+            background: #ffffff;
+            border: 1px solid #edf0f6;
+        }
+
+        /* ================================
+           CHART
+        ================================= */
+
+        .chart-bar {
+            transition:
+                height 0.35s ease,
+                opacity 0.2s ease;
+        }
+
+        .chart-bar:hover {
+            opacity: 0.82;
+        }
+
+        /* ================================
+           DONUT
+        ================================= */
+
+        .donut {
+            width: 168px;
+            height: 168px;
+
+            border-radius: 50%;
+
+            background:
+                conic-gradient(
+                    #6d28ff 0deg 236deg,
+                    #e3ebfa 236deg 360deg
+                );
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .donut-inner {
+            width: 124px;
+            height: 124px;
+
+            border-radius: 50%;
+
+            background: #ffffff;
+
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* ================================
+           EVENTS
+        ================================= */
+
+        .event-row {
+            transition:
+                background 0.2s ease,
+                transform 0.2s ease;
+        }
+
+        .event-row:hover {
+            background: #f4f7fd;
+        }
+
+        /* ================================
+           MOBILE HEADER
+        ================================= */
+
+        .mobile-header {
+            display: none;
+        }
+
+        /* ================================
+           MOBILE DRAWER
+        ================================= */
+
+        .mobile-menu-overlay {
+            display: none;
+        }
+
+        .mobile-menu-overlay.open {
+            display: block;
+        }
+
+        .mobile-drawer {
+            transform: translateX(-105%);
+            transition: transform 0.25s ease;
+        }
+
+        .mobile-drawer.open {
+            transform: translateX(0);
+        }
+
+        /* ================================
+           DATE RANGE
+        ================================= */
+
+        .date-range-popover {
+            position: fixed;
+
+            z-index: 200;
+
+            width: min(
+                390px,
+                calc(100vw - 24px)
+            );
+
+            background: #ffffff;
+
+            border: 1px solid #e7ebf3;
+
+            border-radius: 16px;
+
+            padding: 18px;
+
+            box-shadow:
+                0 18px 45px
+                rgba(16, 33, 58, 0.16);
+
+            display: none;
+        }
+
+        .date-range-popover.open {
+            display: block;
+        }
+
+        .date-range-grid {
+            display: grid;
+
+            grid-template-columns:
+                repeat(2, minmax(0, 1fr));
+
+            gap: 12px;
+        }
+
+        .date-range-input {
+            width: 100%;
+
+            height: 44px;
+
+            border: 1px solid #dfe5ef;
+
+            border-radius: 10px;
+
+            padding: 0 11px;
+
+            background: #f9fbff;
+
+            color: #10213a;
+
+            font-size: 15px !important;
+
+            outline: none;
+        }
+
+        .date-range-input:focus {
+            border-color: #6d28ff;
+
+            box-shadow:
+                0 0 0 3px
+                rgba(109, 40, 255, 0.10);
+        }
+
+        .date-preset {
+            border: 1px solid #e4e9f2;
+
+            border-radius: 9px;
+
+            background: #ffffff;
+
+            color: #475569;
+
+            padding: 9px 11px;
+
+            font-size: 15px !important;
+
+            font-weight: 500;
+
+            transition: 0.2s ease;
+        }
+
+        .date-preset:hover,
+        .date-preset.active {
+            background: #f5f2ff;
+
+            border-color: #d9ccff;
+
+            color: #6d28ff;
+        }
+
+        .date-range-actions {
+            display: flex;
+
+            justify-content: flex-end;
+
+            gap: 10px;
+
+            margin-top: 17px;
+        }
+
+        .date-range-cancel,
+        .date-range-apply {
+            min-height: 42px;
+
+            border-radius: 10px;
+
+            padding: 0 17px;
+
+            font-size: 15px !important;
+
+            font-weight: 600;
+        }
+
+        .date-range-cancel {
+            background: #f1f4f9;
+
+            color: #475569;
+        }
+
+        .date-range-apply {
+            background: #6d28ff;
+
+            color: #ffffff;
+        }
+
+        .date-range-cancel:hover {
+            background: #e7ebf2;
+        }
+
+        .date-range-apply:hover {
+            background: #5d20ed;
+        }
+
+        /* ================================
+           SECONDARY TEXT = 15PX
+        ================================= */
+
+        .secondary-text {
+            font-size: 15px !important;
+            line-height: 1.5 !important;
+        }
+
+        /* ================================
+           LARGE DESKTOP
+        ================================= */
+
+        @media (min-width: 1600px) {
+
+            .sidebar {
+                width: 260px;
+            }
+
+            .main-content {
+                margin-left: 260px;
+            }
+
+            .dashboard-container {
+                padding: 34px;
+            }
+
+            .welcome-title {
+                font-size: 34px !important;
+            }
+
+            .stat-number {
+                font-size: 32px !important;
+            }
+        }
+
+        /* ================================
+           TABLET
+        ================================= */
+
+        @media (max-width: 1200px) {
+
+            .sidebar {
+                width: 220px;
+            }
+
+            .main-content {
+                margin-left: 220px;
+            }
+
+            .dashboard-grid {
+                grid-template-columns:
+                    1.7fr 1fr !important;
+            }
+
+            .event-right {
+                gap: 15px !important;
+            }
+        }
+
+        @media (max-width: 1100px) and (min-width: 769px) {
+
+            .sidebar {
+                width: 205px;
+            }
+
+            .main-content {
+                margin-left: 205px;
+            }
+
+            .dashboard-container {
+                padding: 24px !important;
+            }
+
+            .stats-grid {
+                grid-template-columns:
+                    repeat(2, minmax(0, 1fr))
+                    !important;
+            }
+
+            .dashboard-grid {
+                grid-template-columns:
+                    1fr !important;
+            }
+
+            .event-row {
+                flex-direction: column !important;
+                align-items: stretch !important;
+            }
+
+            .event-right {
+                width: 100%;
+
+                display: grid !important;
+
+                grid-template-columns:
+                    repeat(4, minmax(0, 1fr));
+
+                align-items: end;
+            }
+        }
+
+        @media (max-width: 900px) and (min-width: 769px) {
+
+            .desktop-header {
+                padding-left: 20px !important;
+                padding-right: 20px !important;
+            }
+
+            .dashboard-container {
+                padding: 20px !important;
+            }
+
+            .welcome-title {
+                font-size: 30px !important;
+            }
+
+            .dashboard-container .event-right {
+                grid-template-columns:
+                    repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        /* ================================
+           MOBILE
+        ================================= */
+
+        @media (max-width: 768px) {
+
+            html,
+            body {
+                overflow-x: hidden;
+                overflow-y: auto;
+            }
+
+            .sidebar {
+                display: none !important;
+            }
+
+            .main-content {
+                margin-left: 0 !important;
+                width: 100%;
+            }
+
+            .desktop-header {
+                display: none !important;
+            }
+
+            .mobile-header {
+                display: flex !important;
+
+                position: sticky;
+
+                top: 0;
+
+                z-index: 100;
+            }
+
+            .dashboard-container {
+                width: 100%;
+
+                padding: 18px !important;
+
+                padding-bottom: 45px !important;
+            }
+
+            .stats-grid {
+                grid-template-columns:
+                    1fr !important;
+            }
+
+            .dashboard-grid {
+                grid-template-columns:
+                    1fr !important;
+            }
+
+            .welcome-title {
+                font-size: 28px !important;
+                line-height: 1.15 !important;
+            }
+
+            .dashboard-container
+            section:first-child > div {
+                flex-direction:
+                    column !important;
+
+                align-items:
+                    flex-start !important;
+            }
+
+            .dashboard-container
+            section:first-child
+            .flex.items-center.gap-3.pt-1 {
+
+                width: 100%;
+
+                padding-top: 0 !important;
+            }
+
+            #dashboardDateButton {
+                width: 100%;
+
+                justify-content:
+                    space-between;
+
+                min-height: 46px;
+            }
+
+            #newEventButton {
+                width: 100%;
+
+                justify-content:
+                    center;
+            }
+
+            .dashboard-container
+            .dashboard-card,
+            .dashboard-container
+            .events-card {
+
+                width: 100%;
+            }
+
+            .dashboard-container
+            .dashboard-card {
+
+                padding: 18px !important;
+            }
+
+            .dashboard-container
+            .events-card {
+
+                padding: 18px !important;
+            }
+
+            .recent-events-header {
+                flex-direction:
+                    column !important;
+
+                align-items:
+                    stretch !important;
+
+                gap: 14px !important;
+            }
+
+            .search-box {
+                width: 100% !important;
+            }
+
+            .event-row {
+                width: 100%;
+
+                flex-direction:
+                    column !important;
+
+                align-items:
+                    stretch !important;
+
+                gap: 14px !important;
+            }
+
+            .event-right {
+                width: 100% !important;
+
+                display: grid !important;
+
+                grid-template-columns:
+                    repeat(2, minmax(0, 1fr));
+
+                gap: 12px !important;
+            }
+
+            .event-right > div {
+                width: auto !important;
+            }
+
+            .manage-event-btn,
+            .event-menu-btn {
+                width: 100%;
+
+                min-height: 42px;
+            }
+
+            .dashboard-container
+            .chart-bar {
+                width: 28px !important;
+            }
+
+            .mobile-menu-overlay {
+                position: fixed;
+
+                inset: 0;
+
+                z-index: 150;
+
+                background:
+                    rgba(8, 27, 49, 0.45);
+            }
+
+            .mobile-drawer {
+                display: flex;
+
+                position: fixed;
+
+                left: 0;
+                top: 0;
+                bottom: 0;
+
+                width:
+                    min(82vw, 320px);
+
+                z-index: 160;
+
+                flex-direction:
+                    column;
+
+                background:
+                    #081B31;
+
+                color: #ffffff;
+
+                box-shadow:
+                    12px 0 30px
+                    rgba(0, 0, 0, 0.18);
+
+                padding:
+                    22px 16px;
+            }
+
+            .mobile-drawer-header {
+                display: flex;
+
+                align-items:
+                    center;
+
+                justify-content:
+                    space-between;
+
+                margin-bottom:
+                    28px;
+            }
+
+            .mobile-drawer-link {
+                display: flex;
+
+                align-items:
+                    center;
+
+                gap: 12px;
+
+                width: 100%;
+
+                border-radius:
+                    12px;
+
+                padding:
+                    13px 14px;
+
+                color:
+                    #cbd5e1;
+
+                font-size:
+                    18px;
+
+                font-weight:
+                    500;
+
+                text-decoration:
+                    none;
+            }
+
+            .mobile-drawer-link.active,
+            .mobile-drawer-link:hover {
+                background:
+                    #6d28ff;
+
+                color:
+                    #ffffff;
+            }
+
+            .date-range-popover {
+
+                width:
+                    calc(100vw - 20px);
+
+                left: 10px !important;
+
+                right: 10px;
+
+                padding: 16px;
+
+                border-radius: 14px;
+            }
+
+            .date-range-grid {
+
+                grid-template-columns:
+                    1fr;
+            }
+
+            .date-range-actions {
+
+                display: grid;
+
+                grid-template-columns:
+                    1fr 1fr;
+            }
+
+            .date-range-cancel,
+            .date-range-apply {
+
+                width: 100%;
+            }
+        }
+
+        /* ================================
+           SMALL MOBILE
+        ================================= */
+
+        @media (max-width: 520px) {
+
+            .dashboard-container {
+                padding:
+                    14px !important;
+            }
+
+            .welcome-title {
+                font-size:
+                    25px !important;
+            }
+
+            .dashboard-container
+            .stat-card {
+
+                padding:
+                    16px !important;
+            }
+
+            .dashboard-container
+            .dashboard-card,
+            .dashboard-container
+            .events-card {
+
+                border-radius:
+                    14px;
+            }
+
+            .event-right {
+                grid-template-columns:
+                    1fr 1fr !important;
+            }
+
+            .event-row img {
+                width:
+                    54px !important;
+
+                height:
+                    54px !important;
+            }
+
+            .event-row h4 {
+                font-size:
+                    16px !important;
+            }
+
+            .mobile-header {
+
+                padding-left:
+                    12px !important;
+
+                padding-right:
+                    12px !important;
+            }
+
+            .mobile-header
+            .mobile-logo {
+
+                width:
+                    92px !important;
+            }
+
+            .mobile-header
+            .mobile-action {
+
+                width:
+                    38px !important;
+
+                height:
+                    38px !important;
+            }
+        }
+    </style>
+
+  <!-- Eventra shared organizer layout alignment -->
+  <link rel="stylesheet" href="../shared/eventra-shell.css">
+<style id="eventra-shell-overrides">
+/* Layout is offset by the shared shell (body padding), not by the page. */
+.main-content { margin-left: 0 !important; width: auto !important; }
+</style>
+</head>
+
+<body data-eventra-nav="dashboard">
+<script src="../shared/eventra-shell.js"></script>
+
+    <!-- ==============================================
+         DESKTOP SIDEBAR
+    =============================================== -->
+
+    
+    <!-- ==============================================
+         MAIN CONTENT
+    =============================================== -->
+
+    <main class="main-content">
+
+        <!-- ==========================================
+             MOBILE HEADER
+        =========================================== -->
+
+        
+        <!-- ==========================================
+             DESKTOP HEADER
+        =========================================== -->
+
+        
+        <!-- ==========================================
+             DASHBOARD
+        =========================================== -->
+
+        <div
+            class="
+                dashboard-container
+                min-h-[calc(100vh-76px)]
+                p-[32px]
+                pb-[50px]
+            "
+        >
+
+            <!-- WELCOME -->
+
+            <section class="mb-7">
+
+                <div
+                    class="
+                        flex
+                        items-start
+                        justify-between
+                        gap-5
+                    "
+                >
+
+                    <div>
+
+                        <div
+                            class="
+                                flex
+                                items-center
+                                gap-2
+                                mb-2
+                            "
+                        >
+
+                            <span
+                                class="
+                                    rounded-full
+                                    bg-[#EDE9FE]
+                                    text-eventraPurple
+                                    px-3
+                                    py-1.5
+                                    text-[15px]
+                                    font-semibold
+                                    uppercase
+                                    tracking-wide
+                                "
+                            >
+                                Live Overview
+                            </span>
+
+                            <span
+                                class="
+                                    w-2
+                                    h-2
+                                    rounded-full
+                                    bg-eventraPurple
+                                "
+                            ></span>
+
+                        </div>
+
+                        <h2
+                            class="
+                                welcome-title
+                                text-[34px]
+                                leading-[1.12]
+                                font-semibold
+                                tracking-[-1px]
+                                text-eventraText
+                            "
+                        >
+                            Good morning, Event Organizer
+                        </h2>
+
+                        <p
+                            class="
+                                secondary-text
+                                text-slate-500
+                                mt-1.5
+                            "
+                        >
+                            Here is real-time performance across your active venues and ticket tiers.
+                        </p>
+
+                    </div>
+
+                    <div
+                        class="
+                            flex
+                            items-center
+                            gap-3
+                            pt-1
+                        "
+                    >
+
+                        <!-- DASHBOARD DATE -->
+
+                        <button
+                            id="dashboardDateButton"
+                            type="button"
+                            class="
+                                flex
+                                items-center
+                                gap-2
+                                rounded-xl
+                                border
+                                border-slate-200
+                                bg-white
+                                px-4
+                                py-2.5
+                                text-[15px]
+                                font-medium
+                                text-slate-700
+                            "
+                        >
+
+                            <span
+                                class="text-eventraPurple"
+                            >
+                                ▣
+                            </span>
+
+                            <span
+                                class="date-range-label"
+                            >
+                                Oct 1 – Oct 31, 2026
+                            </span>
+
+                            <span>
+                                ⌄
+                            </span>
+
+                        </button>
+
+                        <!-- NEW EVENT -->
+
+                        <button
+                            id="newEventButton"
+                            type="button"
+                            class="
+                                flex
+                                items-center
+                                gap-2
+                                rounded-xl
+                                bg-eventraPurple
+                                px-5
+                                py-2.5
+                                text-[15px]
+                                font-semibold
+                                text-white
+                                shadow-sm
+                                hover:bg-[#5d20ed]
+                            "
+                        >
+
+                            <span
+                                class="text-[18px]"
+                            >
+                                +
+                            </span>
+
+                            Create New Event
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+            <!-- ========================================
+                 STAT CARDS
+            ========================================= -->
+
+            <section
+                class="
+                    stats-grid
+                    grid
+                    grid-cols-4
+                    gap-4
+                    mb-6
+                "
+            >
+
+                <!-- TOTAL EVENTS -->
+
+                <div
+                    class="
+                        stat-card
+                        rounded-2xl
+                        p-5
+                    "
+                >
+
+                    <div
+                        class="
+                            flex
+                            items-start
+                            justify-between
+                        "
+                    >
+
+                        <div>
+
+                            <p
+                                class="
+                                    secondary-text
+                                    text-slate-500
+                                "
+                            >
+                                Total Events
+                            </p>
+
+                            <p
+                                id="statTotalEvents"
+                                class="
+                                    stat-number
+                                    text-[32px]
+                                    font-semibold
+                                    text-eventraText
+                                    mt-2
+                                "
+                            >
+                                24
+                            </p>
+
+                        </div>
+
+                        <div
+                            class="
+                                w-10
+                                h-10
+                                rounded-xl
+                                bg-[#F1EDFF]
+                                text-eventraPurple
+                                flex
+                                items-center
+                                justify-center
+                                text-xl
+                            "
+                        >
+                            ▣
+                        </div>
+
+                    </div>
+
+                    <p
+                        id="statChangeEvents"
+                        class="
+                            secondary-text
+                            text-slate-400
+                            font-medium
+                            mt-4
+                        "
+                    >
+                        —
+                    </p>
+
+                </div>
+
+                <!-- TICKETS SOLD -->
+
+                <div
+                    class="
+                        stat-card
+                        rounded-2xl
+                        p-5
+                    "
+                >
+
+                    <div
+                        class="
+                            flex
+                            items-start
+                            justify-between
+                        "
+                    >
+
+                        <div>
+
+                            <p
+                                class="
+                                    secondary-text
+                                    text-slate-500
+                                "
+                            >
+                                Tickets Sold
+                            </p>
+
+                            <p
+                                id="statTicketsSold"
+                                class="
+                                    stat-number
+                                    text-[32px]
+                                    font-semibold
+                                    text-eventraText
+                                    mt-2
+                                "
+                            >
+                                1,284
+                            </p>
+
+                        </div>
+
+                        <div
+                            class="
+                                w-10
+                                h-10
+                                rounded-xl
+                                bg-[#EEF5FF]
+                                text-blue-600
+                                flex
+                                items-center
+                                justify-center
+                                text-xl
+                            "
+                        >
+                            ▤
+                        </div>
+
+                    </div>
+
+                    <p
+                        id="statChangeTickets"
+                        class="
+                            secondary-text
+                            text-slate-400
+                            font-medium
+                            mt-4
+                        "
+                    >
+                        —
+                    </p>
+
+                </div>
+
+                <!-- REVENUE -->
+
+                <div
+                    class="
+                        stat-card
+                        rounded-2xl
+                        p-5
+                    "
+                >
+
+                    <div
+                        class="
+                            flex
+                            items-start
+                            justify-between
+                        "
+                    >
+
+                        <div>
+
+                            <p
+                                class="
+                                    secondary-text
+                                    text-slate-500
+                                "
+                            >
+                                Revenue
+                            </p>
+
+                            <p
+                                id="statRevenue"
+                                class="
+                                    stat-number
+                                    text-[32px]
+                                    font-semibold
+                                    text-eventraText
+                                    mt-2
+                                "
+                            >
+                                ₦4.82M
+                            </p>
+
+                        </div>
+
+                        <div
+                            class="
+                                w-10
+                                h-10
+                                rounded-xl
+                                bg-[#E9FBF3]
+                                text-emerald-600
+                                flex
+                                items-center
+                                justify-center
+                                text-xl
+                            "
+                        >
+                            ₦
+                        </div>
+
+                    </div>
+
+                    <p
+                        id="statChangeRevenue"
+                        class="
+                            secondary-text
+                            text-slate-400
+                            font-medium
+                            mt-4
+                        "
+                    >
+                        —
+                    </p>
+
+                </div>
+
+                <!-- ATTENDANCE -->
+
+                <div
+                    class="
+                        stat-card
+                        rounded-2xl
+                        p-5
+                    "
+                >
+
+                    <div
+                        class="
+                            flex
+                            items-start
+                            justify-between
+                        "
+                    >
+
+                        <div>
+
+                            <p
+                                class="
+                                    secondary-text
+                                    text-slate-500
+                                "
+                            >
+                                Attendance Rate
+                            </p>
+
+                            <p
+                                id="statAttendanceRate"
+                                class="
+                                    stat-number
+                                    text-[32px]
+                                    font-semibold
+                                    text-eventraText
+                                    mt-2
+                                "
+                            >
+                                82.4%
+                            </p>
+
+                        </div>
+
+                        <div
+                            class="
+                                w-10
+                                h-10
+                                rounded-xl
+                                bg-[#FFF5E8]
+                                text-orange-500
+                                flex
+                                items-center
+                                justify-center
+                                text-xl
+                            "
+                        >
+                            ✓
+                        </div>
+
+                    </div>
+
+                    <p
+                        class="
+                            secondary-text
+                            text-slate-500
+                            mt-4
+                        "
+                    >
+                        Based on checked-in attendees
+                    </p>
+
+                </div>
+
+            </section>
+
+            <!-- ========================================
+                 SALES + ATTENDANCE
+            ========================================= -->
+
+            <section
+                class="
+                    dashboard-grid
+                    grid
+                    grid-cols-[1.7fr_1fr]
+                    gap-5
+                    mb-6
+                "
+            >
+
+                <!-- SALES -->
+
+                <div
+                    class="
+                        dashboard-card
+                        rounded-2xl
+                        p-6
+                    "
+                >
+
+                    <div
+                        class="
+                            flex
+                            items-start
+                            justify-between
+                            gap-4
+                        "
+                    >
+
+                        <div>
+
+                            <h3
+                                class="
+                                    text-[18px]
+                                    font-semibold
+                                    text-eventraText
+                                "
+                            >
+                                Sales Overview
+                            </h3>
+
+                            <p
+                                class="
+                                    secondary-text
+                                    text-slate-500
+                                    mt-1
+                                "
+                            >
+                                Ticket sales performance over time
+                            </p>
+
+                        </div>
+
+                        <button
+                            type="button"
+                            class="
+                                rounded-xl
+                                border
+                                border-slate-200
+                                bg-white
+                                px-4
+                                py-2.5
+                                text-[15px]
+                                text-slate-700
+                            "
+                        >
+                            This Month
+                            <span class="ml-1 text-xs">
+                                ⌄
+                            </span>
+                        </button>
+
+                    </div>
+
+                    <!-- CHART -->
+
+                    <div
+                        class="
+                            mt-6
+                            h-[245px]
+                            flex
+                            items-end
+                            gap-5
+                            border-b
+                            border-slate-200
+                            px-4
+                            pb-0
+                            overflow-hidden
+                        "
+                    >
+
+                        <div
+                            id="dashboardChartYAxis"
+                            class="
+                                h-full
+                                flex
+                                flex-col
+                                justify-between
+                                text-[15px]
+                                text-slate-400
+                                pr-2
+                            "
+                        >
+                            <span id="yAxisMax">—</span>
+                            <span id="yAxis75"></span>
+                            <span id="yAxis50"></span>
+                            <span id="yAxis25"></span>
+                            <span>₦0</span>
+                        </div>
+
+                        <div
+                            id="dashboardChartBars"
+                            class="
+                                flex-1
+                                h-full
+                                flex
+                                items-end
+                                justify-between
+                                gap-3
+                                relative
+                            "
+                        >
+
+                            <div
+                                class="
+                                    absolute
+                                    left-0
+                                    right-0
+                                    top-0
+                                    border-t
+                                    border-dashed
+                                    border-slate-200
+                                "
+                            ></div>
+
+                            <div
+                                class="
+                                    absolute
+                                    left-0
+                                    right-0
+                                    top-1/4
+                                    border-t
+                                    border-dashed
+                                    border-slate-200
+                                "
+                            ></div>
+
+                            <div
+                                class="
+                                    absolute
+                                    left-0
+                                    right-0
+                                    top-2/4
+                                    border-t
+                                    border-dashed
+                                    border-slate-200
+                                "
+                            ></div>
+
+                            <div
+                                class="
+                                    absolute
+                                    left-0
+                                    right-0
+                                    top-3/4
+                                    border-t
+                                    border-dashed
+                                    border-slate-200
+                                "
+                            ></div>
+
+                            <div
+                                class="
+                                    chart-bar
+                                    w-8
+                                    h-[32%]
+                                    rounded-t-md
+                                    bg-eventraPurple
+                                    z-10
+                                "
+                                title="January"
+                            ></div>
+
+                            <div
+                                class="
+                                    chart-bar
+                                    w-8
+                                    h-[48%]
+                                    rounded-t-md
+                                    bg-eventraPurple
+                                    z-10
+                                "
+                                title="February"
+                            ></div>
+
+                            <div
+                                class="
+                                    chart-bar
+                                    w-8
+                                    h-[42%]
+                                    rounded-t-md
+                                    bg-eventraPurple
+                                    z-10
+                                "
+                                title="March"
+                            ></div>
+
+                            <div
+                                class="
+                                    chart-bar
+                                    w-8
+                                    h-[63%]
+                                    rounded-t-md
+                                    bg-eventraPurple
+                                    z-10
+                                "
+                                title="April"
+                            ></div>
+
+                            <div
+                                class="
+                                    chart-bar
+                                    w-8
+                                    h-[55%]
+                                    rounded-t-md
+                                    bg-eventraPurple
+                                    z-10
+                                "
+                                title="May"
+                            ></div>
+
+                            <div
+                                class="
+                                    chart-bar
+                                    w-8
+                                    h-[76%]
+                                    rounded-t-md
+                                    bg-eventraPurple
+                                    z-10
+                                "
+                                title="June"
+                            ></div>
+
+                            <div
+                                class="
+                                    chart-bar
+                                    w-8
+                                    h-[67%]
+                                    rounded-t-md
+                                    bg-eventraPurple
+                                    z-10
+                                "
+                                title="July"
+                            ></div>
+
+                            <div
+                                class="
+                                    chart-bar
+                                    w-8
+                                    h-[84%]
+                                    rounded-t-md
+                                    bg-eventraPurple
+                                    z-10
+                                "
+                                title="August"
+                            ></div>
+
+                            <div
+                                class="
+                                    chart-bar
+                                    w-8
+                                    h-[70%]
+                                    rounded-t-md
+                                    bg-eventraPurple
+                                    z-10
+                                "
+                                title="September"
+                            ></div>
+
+                            <div
+                                class="
+                                    chart-bar
+                                    w-8
+                                    h-[92%]
+                                    rounded-t-md
+                                    bg-eventraPurple
+                                    z-10
+                                "
+                                title="October"
+                            ></div>
+
+                            <div
+                                class="
+                                    chart-bar
+                                    w-8
+                                    h-[78%]
+                                    rounded-t-md
+                                    bg-eventraPurple
+                                    z-10
+                                "
+                                title="November"
+                            ></div>
+
+                            <div
+                                class="
+                                    chart-bar
+                                    w-8
+                                    h-[97%]
+                                    rounded-t-md
+                                    bg-eventraPurple
+                                    z-10
+                                "
+                                title="December"
+                            ></div>
+
+                        </div>
+
+                    </div>
+
+                    <div
+                        id="dashboardChartLabels"
+                        class="
+                            ml-[55px]
+                            mt-2
+                            flex
+                            justify-between
+                            text-[15px]
+                            text-slate-400
+                        "
+                    >
+                        <span>—</span>
+                    </div>
+
+                </div>
+
+                <!-- ATTENDANCE -->
+
+                <div
+                    class="
+                        dashboard-card
+                        rounded-2xl
+                        p-6
+                    "
+                >
+
+                    <h3
+                        class="
+                            text-[18px]
+                            font-semibold
+                            text-eventraText
+                        "
+                    >
+                        Attendance
+                    </h3>
+
+                    <p
+                        class="
+                            secondary-text
+                            text-slate-500
+                            mt-1
+                        "
+                    >
+                        Current check-in performance
+                    </p>
+
+                    <div
+                        class="
+                            flex
+                            justify-center
+                            mt-7
+                        "
+                    >
+
+                        <div id="attendanceDonut" class="donut">
+
+                            <div
+                                class="donut-inner"
+                            >
+
+                                <span
+                                    id="donutPercent"
+                                    class="
+                                        text-[28px]
+                                        font-semibold
+                                        text-eventraText
+                                    "
+                                >
+                                    —
+                                </span>
+
+                                <span
+                                    class="
+                                        text-[15px]
+                                        text-slate-500
+                                        mt-1
+                                    "
+                                >
+                                    confirmed
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <div
+                        class="
+                            mt-6
+                            space-y-4
+                        "
+                    >
+
+                        <div
+                            class="
+                                flex
+                                items-center
+                                justify-between
+                            "
+                        >
+
+                            <div
+                                class="
+                                    flex
+                                    items-center
+                                    gap-2
+                                "
+                            >
+
+                                <span
+                                    class="
+                                        w-2.5
+                                        h-2.5
+                                        rounded-full
+                                        bg-eventraPurple
+                                    "
+                                ></span>
+
+                                <span
+                                    class="
+                                        text-[15px]
+                                        text-slate-600
+                                    "
+                                >
+                                    Confirmed
+                                </span>
+
+                            </div>
+
+                            <strong
+                                id="confirmedCount"
+                                class="
+                                    text-[15px]
+                                    text-eventraText
+                                "
+                            >
+                                —
+                            </strong>
+
+                        </div>
+
+                        <div
+                            class="
+                                flex
+                                items-center
+                                justify-between
+                            "
+                        >
+
+                            <div
+                                class="
+                                    flex
+                                    items-center
+                                    gap-2
+                                "
+                            >
+
+                                <span
+                                    class="
+                                        w-2.5
+                                        h-2.5
+                                        rounded-full
+                                        bg-[#DDE5F2]
+                                    "
+                                ></span>
+
+                                <span
+                                    class="
+                                        text-[15px]
+                                        text-slate-600
+                                    "
+                                >
+                                    Pending / Other
+                                </span>
+
+                            </div>
+
+                            <strong
+                                id="pendingCount"
+                                class="
+                                    text-[15px]
+                                    text-eventraText
+                                "
+                            >
+                                —
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+            <!-- ========================================
+                 WEEKLY OVERVIEW
+            ========================================= -->
+
+            <section
+                class="
+                    dashboard-card
+                    rounded-2xl
+                    p-6
+                    mb-6
+                "
+            >
+
+                <h3
+                    class="
+                        text-[18px]
+                        font-semibold
+                        text-eventraText
+                    "
+                >
+                    Weekly Overview
+                </h3>
+
+                <p
+                    class="
+                        secondary-text
+                        text-slate-500
+                        mt-1
+                    "
+                >
+                    Track your event performance by week.
+                </p>
+
+                <div
+                    class="
+                        grid
+                        grid-cols-5
+                        gap-3
+                        mt-5
+                    "
+                >
+
+                    <button
+                        type="button"
+                        class="
+                            rounded-xl
+                            bg-[#F7F9FD]
+                            px-4
+                            py-4
+                            text-[15px]
+                            font-medium
+                            text-slate-600
+                            hover:bg-[#EEF2FF]
+                        "
+                    >
+                        Week 1
+                    </button>
+
+                    <button
+                        type="button"
+                        class="
+                            rounded-xl
+                            bg-[#F7F9FD]
+                            px-4
+                            py-4
+                            text-[15px]
+                            font-medium
+                            text-slate-600
+                            hover:bg-[#EEF2FF]
+                        "
+                    >
+                        Week 2
+                    </button>
+
+                    <button
+                        type="button"
+                        class="
+                            rounded-xl
+                            bg-[#F7F9FD]
+                            px-4
+                            py-4
+                            text-[15px]
+                            font-medium
+                            text-slate-600
+                            hover:bg-[#EEF2FF]
+                        "
+                    >
+                        Week 3
+                    </button>
+
+                    <button
+                        type="button"
+                        class="
+                            rounded-xl
+                            bg-[#F1EDFF]
+                            px-4
+                            py-4
+                            text-[15px]
+                            font-semibold
+                            text-eventraPurple
+                        "
+                    >
+                        Week 4
+                    </button>
+
+                    <button
+                        type="button"
+                        class="
+                            rounded-xl
+                            bg-[#F7F9FD]
+                            px-4
+                            py-4
+                            text-[15px]
+                            font-medium
+                            text-slate-600
+                            hover:bg-[#EEF2FF]
+                        "
+                    >
+                        Week 5
+                    </button>
+
+                </div>
+
+            </section>
+
+            <!-- ========================================
+                 RECENT EVENTS
+            ========================================= -->
+
+            <section
+                class="
+                    events-card
+                    rounded-2xl
+                    p-6
+                "
+            >
+
+                <div
+                    class="
+                        recent-events-header
+                        flex
+                        items-center
+                        justify-between
+                        gap-4
+                        mb-5
+                    "
+                >
+
+                    <div>
+
+                        <h3
+                            class="
+                                text-[18px]
+                                font-semibold
+                                text-eventraText
+                            "
+                        >
+                            Recent Events
+                        </h3>
+
+                        <p
+                            class="
+                                secondary-text
+                                text-slate-500
+                                mt-1
+                            "
+                        >
+                            Manage door status, guest lists, and tier allocations
+                        </p>
+
+                    </div>
+
+                    <!-- SEARCH -->
+
+                    <div
+                        class="
+                            search-box
+                            relative
+                            w-[260px]
+                        "
+                    >
+
+                        <span
+                            class="
+                                absolute
+                                left-4
+                                top-1/2
+                                -translate-y-1/2
+                                text-slate-400
+                            "
+                        >
+                            ⌕
+                        </span>
+
+                        <input
+                            id="eventSearch"
+                            type="text"
+                            placeholder="Search event..."
+                            class="
+                                w-full
+                                rounded-xl
+                                bg-[#EEF2FF]
+                                border-0
+                                outline-none
+                                px-10
+                                py-3
+                                text-[15px]
+                                text-eventraText
+                                placeholder:text-slate-400
+                            "
+                        >
+
+                    </div>
+
+                </div>
+
+                <div id="eventsList">
+
+                <!-- EVENT 1 -->
+
+                <div
+                    class="
+                        event-row
+                        event-item
+                        flex
+                        items-center
+                        justify-between
+                        gap-5
+                        rounded-xl
+                        bg-[#F7F9FD]
+                        p-4
+                        mb-4
+                    "
+                    data-event="tech conference 2026"
+                >
+
+                    <div
+                        class="
+                            flex
+                            items-center
+                            gap-4
+                            min-w-0
+                        "
+                    >
+
+                        <img
+                            src="./Tech Conference 2026.png"
+                            alt="Tech Conference 2026"
+                            class="
+                                w-[66px]
+                                h-[66px]
+                                rounded-xl
+                                object-cover
+                                shrink-0
+                            "
+                        >
+
+                        <div
+                            class="min-w-0"
+                        >
+
+                            <div
+                                class="
+                                    flex
+                                    items-center
+                                    gap-2
+                                    flex-wrap
+                                "
+                            >
+
+                                <h4
+                                    class="
+                                        text-[18px]
+                                        font-semibold
+                                        text-eventraText
+                                    "
+                                >
+                                    Tech Conference 2026
+                                </h4>
+
+                                <span
+                                    class="
+                                        rounded-full
+                                        bg-[#DDF8EB]
+                                        px-2.5
+                                        py-1
+                                        text-[14px]
+                                        font-medium
+                                        text-emerald-600
+                                    "
+                                >
+                                    Active Live
+                                </span>
+
+                            </div>
+
+                            <div
+                                class="
+                                    flex
+                                    flex-wrap
+                                    gap-x-4
+                                    gap-y-1
+                                    mt-2
+                                "
+                            >
+
+                                <span
+                                    class="
+                                        text-[15px]
+                                        text-slate-500
+                                    "
+                                >
+                                    ▣ Oct 12, 2026
+                                </span>
+
+                                <span
+                                    class="
+                                        text-[15px]
+                                        text-slate-500
+                                    "
+                                >
+                                    ⌖ Landmark Centre, Lagos
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <div
+                        class="
+                            event-right
+                            flex
+                            items-center
+                            gap-5
+                            shrink-0
+                        "
+                    >
+
+                        <div
+                            class="w-[125px]"
+                        >
+
+                            <p
+                                class="
+                                    text-[14px]
+                                    uppercase
+                                    text-slate-500
+                                    font-medium
+                                "
+                            >
+                                Passes Sold
+                            </p>
+
+                            <p
+                                class="
+                                    text-[15px]
+                                    font-semibold
+                                    text-eventraText
+                                    mt-1
+                                "
+                            >
+                                328 / 500 sold
+                            </p>
+
+                            <div
+                                class="
+                                    h-1.5
+                                    rounded-full
+                                    bg-[#E4EAF5]
+                                    mt-1.5
+                                    overflow-hidden
+                                "
+                            >
+
+                                <div
+                                    class="
+                                        h-full
+                                        w-[66%]
+                                        rounded-full
+                                        bg-eventraPurple
+                                    "
+                                ></div>
+
+                            </div>
+
+                        </div>
+
+                        <div
+                            class="w-[110px]"
+                        >
+
+                            <p
+                                class="
+                                    text-[14px]
+                                    uppercase
+                                    text-slate-500
+                                    font-medium
+                                "
+                            >
+                                Gross Sales
+                            </p>
+
+                            <p
+                                class="
+                                    text-[15px]
+                                    font-semibold
+                                    text-eventraText
+                                    mt-1
+                                "
+                            >
+                                ₦16,420,000
+                            </p>
+
+                        </div>
+
+                        <button
+                            type="button"
+                            class="
+                                manage-event-btn
+                                rounded-lg
+                                bg-[#EAF0FD]
+                                px-4
+                                py-2.5
+                                text-[15px]
+                                font-semibold
+                                text-eventraText
+                                hover:bg-[#E2E9FA]
+                            "
+                            data-event-name="Tech Conference 2026"
+                        >
+                            Manage →
+                        </button>
+
+                        <button
+                            type="button"
+                            class="
+                                event-menu-btn
+                                w-9
+                                h-9
+                                rounded-lg
+                                bg-[#EEF2FA]
+                                text-slate-600
+                                hover:bg-[#E3E8F4]
+                            "
+                            data-event-name="Tech Conference 2026"
+                            aria-label="Tech Conference 2026 options"
+                        >
+                            ⋮
+                        </button>
+
+                    </div>
+
+                </div>
+
+                <!-- EVENT 2 -->
+
+                <div
+                    class="
+                        event-row
+                        event-item
+                        flex
+                        items-center
+                        justify-between
+                        gap-5
+                        rounded-xl
+                        bg-[#F7F9FD]
+                        p-4
+                    "
+                    data-event="lagos food culture festival"
+                >
+
+                    <div
+                        class="
+                            flex
+                            items-center
+                            gap-4
+                            min-w-0
+                        "
+                    >
+
+                        <img
+                            src="./Lagos Food.png"
+                            alt="Lagos Food & Culture Festival"
+                            class="
+                                w-[66px]
+                                h-[66px]
+                                rounded-xl
+                                object-cover
+                                shrink-0
+                            "
+                            onerror="this.src='./Tech Conference 2026.png'"
+                        >
+
+                        <div
+                            class="min-w-0"
+                        >
+
+                            <div
+                                class="
+                                    flex
+                                    items-center
+                                    gap-2
+                                    flex-wrap
+                                "
+                            >
+
+                                <h4
+                                    class="
+                                        text-[18px]
+                                        font-semibold
+                                        text-eventraText
+                                    "
+                                >
+                                    Lagos Food & Culture Festival
+                                </h4>
+
+                                <span
+                                    class="
+                                        rounded-full
+                                        bg-[#FFF0D7]
+                                        px-2.5
+                                        py-1
+                                        text-[14px]
+                                        font-medium
+                                        text-orange-600
+                                    "
+                                >
+                                    Upcoming
+                                </span>
+
+                            </div>
+
+                            <div
+                                class="
+                                    flex
+                                    flex-wrap
+                                    gap-x-4
+                                    gap-y-1
+                                    mt-2
+                                "
+                            >
+
+                                <span
+                                    class="
+                                        text-[15px]
+                                        text-slate-500
+                                    "
+                                >
+                                    ▣ Nov 5, 2026
+                                </span>
+
+                                <span
+                                    class="
+                                        text-[15px]
+                                        text-slate-500
+                                    "
+                                >
+                                    ⌖ Muri Okunola Park, Lagos
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <div
+                        class="
+                            event-right
+                            flex
+                            items-center
+                            gap-5
+                            shrink-0
+                        "
+                    >
+
+                        <div
+                            class="w-[125px]"
+                        >
+
+                            <p
+                                class="
+                                    text-[14px]
+                                    uppercase
+                                    text-slate-500
+                                    font-medium
+                                "
+                            >
+                                Passes Sold
+                            </p>
+
+                            <p
+                                class="
+                                    text-[15px]
+                                    font-semibold
+                                    text-eventraText
+                                    mt-1
+                                "
+                            >
+                                420 / 600 sold
+                            </p>
+
+                            <div
+                                class="
+                                    h-1.5
+                                    rounded-full
+                                    bg-[#E4EAF5]
+                                    mt-1.5
+                                    overflow-hidden
+                                "
+                            >
+
+                                <div
+                                    class="
+                                        h-full
+                                        w-[70%]
+                                        rounded-full
+                                        bg-[#7B4A00]
+                                    "
+                                ></div>
+
+                            </div>
+
+                        </div>
+
+                        <div
+                            class="w-[110px]"
+                        >
+
+                            <p
+                                class="
+                                    text-[14px]
+                                    uppercase
+                                    text-slate-500
+                                    font-medium
+                                "
+                            >
+                                Gross Sales
+                            </p>
+
+                            <p
+                                class="
+                                    text-[15px]
+                                    font-semibold
+                                    text-eventraText
+                                    mt-1
+                                "
+                            >
+                                ₦8,400,000
+                            </p>
+
+                        </div>
+
+                        <button
+                            type="button"
+                            class="
+                                manage-event-btn
+                                rounded-lg
+                                bg-[#EAF0FD]
+                                px-4
+                                py-2.5
+                                text-[15px]
+                                font-semibold
+                                text-eventraText
+                                hover:bg-[#E2E9FA]
+                            "
+                            data-event-name="Lagos Food & Culture Festival"
+                        >
+                            Manage →
+                        </button>
+
+                        <button
+                            type="button"
+                            class="
+                                event-menu-btn
+                                w-9
+                                h-9
+                                rounded-lg
+                                bg-[#EEF2FA]
+                                text-slate-600
+                                hover:bg-[#E3E8F4]
+                            "
+                            data-event-name="Lagos Food & Culture Festival"
+                            aria-label="Lagos Food & Culture Festival options"
+                        >
+                            ⋮
+                        </button>
+
+                    </div>
+
+                </div>
+
+                </div><!-- /#eventsList -->
+
+                <!-- EMPTY -->
+
+                <div
+                    id="emptyEvents"
+                    class="
+                        hidden
+                        text-center
+                        py-10
+                        text-[15px]
+                        text-slate-500
+                    "
+                >
+                    No events found.
+                </div>
+
+            </section>
+
+        </div>
+
+        <!-- ==============================================
+             MOBILE MENU OVERLAY
+        =============================================== -->
+
+        
+        <!-- ==============================================
+             MOBILE DRAWER
+        =============================================== -->
+
+        
+    </main>
+
+    <!-- ==============================================
+         DATE RANGE POPOVER
+    =============================================== -->
+
+    <div
+        id="dateRangePopover"
+        class="
+            date-range-popover
+        "
+        aria-hidden="true"
+    >
+
+        <div
+            class="
+                flex
+                items-start
+                justify-between
+                gap-4
+                mb-4
+            "
+        >
+
+            <div>
+
+                <h3
+                    class="
+                        text-[17px]
+                        font-semibold
+                        text-eventraText
+                    "
+                >
+                    Select date range
+                </h3>
+
+                <p
+                    class="
+                        text-[15px]
+                        text-slate-500
+                        mt-1
+                    "
+                >
+                    Choose the period for the dashboard.
+                </p>
+
+            </div>
+
+            <button
+                id="dateRangeClose"
+                type="button"
+                class="
+                    w-8
+                    h-8
+                    rounded-lg
+                    bg-slate-100
+                    text-slate-600
+                    flex
+                    items-center
+                    justify-center
+                    text-lg
+                "
+                aria-label="Close date range"
+            >
+                ×
+            </button>
+
+        </div>
+
+        <div
+            class="
+                flex
+                flex-wrap
+                gap-2
+                mb-4
+            "
+        >
+
+            <button
+                type="button"
+                class="date-preset"
+                data-range="today"
+            >
+                Today
+            </button>
+
+            <button
+                type="button"
+                class="date-preset"
+                data-range="7days"
+            >
+                Last 7 Days
+            </button>
+
+            <button
+                type="button"
+                class="date-preset"
+                data-range="month"
+            >
+                This Month
+            </button>
+
+            <button
+                type="button"
+                class="date-preset"
+                data-range="30days"
+            >
+                Last 30 Days
+            </button>
+
+        </div>
+
+        <div
+            class="date-range-grid"
+        >
+
+            <label>
+
+                <span
+                    class="
+                        block
+                        text-[15px]
+                        font-medium
+                        text-slate-600
+                        mb-1.5
+                    "
+                >
+                    Start Date
+                </span>
+
+                <input
+                    id="dateRangeStart"
+                    class="date-range-input"
+                    type="date"
+                >
+
+            </label>
+
+            <label>
+
+                <span
+                    class="
+                        block
+                        text-[15px]
+                        font-medium
+                        text-slate-600
+                        mb-1.5
+                    "
+                >
+                    End Date
+                </span>
+
+                <input
+                    id="dateRangeEnd"
+                    class="date-range-input"
+                    type="date"
+                >
+
+            </label>
+
+        </div>
+
+        <div
+            class="
+                date-range-actions
+            "
+        >
+
+            <button
+                id="dateRangeCancel"
+                type="button"
+                class="
+                    date-range-cancel
+                "
+            >
+                Cancel
+            </button>
+
+            <button
+                id="dateRangeApply"
+                type="button"
+                class="
+                    date-range-apply
+                "
+            >
+                Apply Range
+            </button>
+
+        </div>
+
+    </div>
+
+    <!-- ==============================================
+         EVENT MENU
+    =============================================== -->
+
+    <div
+        id="eventMenu"
+        class="
+            hidden
+            fixed
+            z-[250]
+            w-[190px]
+            rounded-xl
+            border
+            border-slate-100
+            bg-white
+            p-2
+            shadow-xl
+        "
+    >
+
+        <button
+            id="viewEventAction"
+            type="button"
+            class="
+                w-full
+                rounded-lg
+                px-3
+                py-3
+                text-left
+                text-[15px]
+                text-slate-700
+                hover:bg-slate-50
+            "
+        >
+            View Event
+        </button>
+
+        <button
+            id="editEventAction"
+            type="button"
+            class="
+                w-full
+                rounded-lg
+                px-3
+                py-3
+                text-left
+                text-[15px]
+                text-slate-700
+                hover:bg-slate-50
+            "
+        >
+            Edit Event
+        </button>
+
+        <button
+            id="duplicateEventAction"
+            type="button"
+            class="
+                w-full
+                rounded-lg
+                px-3
+                py-3
+                text-left
+                text-[15px]
+                text-slate-700
+                hover:bg-slate-50
+            "
+        >
+            Duplicate
+        </button>
+
+    </div>
+
+    <!-- ==============================================
+         TOAST
+    =============================================== -->
+
+    <div
+        id="toast"
+        class="
+            hidden
+            fixed
+            right-6
+            bottom-6
+            z-[300]
+        "
+    >
+
+        <div
+            class="
+                min-w-[270px]
+                max-w-[360px]
+                rounded-xl
+                bg-[#10213A]
+                px-5
+                py-4
+                text-white
+                shadow-xl
+            "
+        >
+
+            <p
+                id="toastTitle"
+                class="
+                    text-[15px]
+                    font-semibold
+                "
+            >
+                Eventra
+            </p>
+
+            <p
+                id="toastMessage"
+                class="
+                    text-[15px]
+                    text-slate-300
+                    mt-1
+                "
+            >
+                Action completed.
+            </p>
+
+        </div>
+
+    </div>
+
+    <script src="./script.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#081B31">
+  <title>Create Event — Tickets &amp; Pricing | Eventra Organizer</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ["Inter", "Arial", "Helvetica", "sans-serif"]
+          },
+          colors: {
+            eventra: "#6D28FF",
+            navy: "#081B31",
+            canvas: "#F5F7FC"
+          },
+          boxShadow: {
+            panel: "0 2px 8px rgba(17,35,61,.035)"
+          }
+        }
+      }
+    };
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    * { box-sizing: border-box; }
+    html { min-height: 100%; scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Inter, Arial, Helvetica, sans-serif;
+      font-style: normal;
+      background: #F5F7FC;
+      color: #10223B;
+    }
+    button, input, select, textarea { font: inherit; font-style: normal; }
+    button { cursor: pointer; }
+    button:focus-visible, input:focus-visible, select:focus-visible {
+      outline: 3px solid rgba(109,40,255,.25);
+      outline-offset: 2px;
+    }
+    .scrollbar-none { scrollbar-width: none; }
+    .scrollbar-none::-webkit-scrollbar { display: none; }
+    .field {
+      width: 100%;
+      min-width: 0;
+      border: 1px solid #DDE5F3;
+      border-radius: 10px;
+      background: #F0F4FF;
+      color: #10223B;
+      padding: 11px 12px;
+      font-size: 15px;
+      transition: border-color .15s, box-shadow .15s;
+    }
+    .field:focus {
+      outline: none;
+      border-color: #6D28FF;
+      box-shadow: 0 0 0 3px rgba(109,40,255,.10);
+    }
+    .field-label { display: block; margin-bottom: 7px; font-size: 14px; font-weight: 600; color: #263850; }
+    .helper { font-size: 14px; line-height: 1.5; color: #68758B; }
+    .tier-card { transition: border-color .15s, box-shadow .15s; }
+    .tier-card:hover { border-color: #D8CCFF; }
+    .tier-card.dragging { opacity: .5; }
+    .tier-card.drag-over { border-color: #6D28FF; box-shadow: 0 0 0 3px rgba(109,40,255,.10); }
+    .icon-button { display: inline-grid; place-items: center; width: 42px; height: 42px; border-radius: 12px; background: #EEF3FF; color: #10223B; transition: background .15s; }
+    .icon-button:hover { background: #E1E9FC; }
+    .toggle-track { position: relative; display: inline-flex; height: 24px; width: 42px; flex: 0 0 auto; align-items: center; border-radius: 999px; background: #CBD5E1; transition: background .2s; }
+    .toggle-track::after { content: ""; width: 18px; height: 18px; margin-left: 3px; border-radius: 50%; background: white; box-shadow: 0 1px 3px #0002; transition: transform .2s; }
+    .toggle-input:checked + .toggle-track { background: #5B00E8; }
+    .toggle-input:checked + .toggle-track::after { transform: translateX(18px); }
+    .check-control { accent-color: #5B00E8; width: 16px; height: 16px; }
+    .step-line { position: absolute; top: 17px; left: 8%; right: 8%; height: 4px; border-radius: 999px; background: #E5ECFB; }
+    .step-progress { position: absolute; top: 17px; left: 8%; width: 42%; height: 4px; border-radius: 999px; background: #6D28FF; }
+    .toast { animation: toast-in .2s ease-out; }
+    @keyframes toast-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    @media (max-width: 1023px) {
+      .desktop-sidebar { display: none; }
+      .main-area { margin-left: 0 !important; }
+    }
+    @media (max-width: 767px) {
+      .topbar-date { display: none; }
+      .stepper-inner { min-width: 700px; }
+      .page-content { padding: 18px 14px 30px !important; }
+      .topbar { padding-left: 14px !important; padding-right: 14px !important; }
+      .tier-actions { flex-wrap: wrap; }
+      .summary-numbers { align-items: flex-start !important; flex-direction: column; gap: 18px; }
+      .footer-actions { flex-direction: column; align-items: stretch !important; }
+      .footer-actions > div { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+      .footer-actions button { justify-content: center; }
+    }
+    @media (max-width: 420px) {
+      .topbar-title { font-size: 16px !important; }
+      .header-actions button { width: 38px; height: 38px; }
+      .footer-actions > div { grid-template-columns: 1fr; }
+      .tier-price { font-size: 25px !important; }
+    }
+  </style>
+
+  <!-- Eventra shared organizer layout alignment -->
+  <link rel="stylesheet" href="../shared/eventra-shell.css">
+</head>
+
+<body class="bg-canvas text-[#10223B] antialiased" data-eventra-nav="events">
+<script src="../shared/eventra-shell.js"></script>
+  <div class="min-h-screen">
+    <!-- Mobile header -->
+    
+    <!-- Sidebar -->
+    
+    <!-- Mobile navigation drawer -->
+        
+    <!-- Main -->
+    <div class="main-area min-h-screen">
+      <!-- Desktop topbar -->
+      
+      <main class="page-content mx-auto w-full max-w-[1700px] px-7 py-7 xl:px-8">
+        <!-- Page heading -->
+        <section class="mb-6 flex flex-col justify-between gap-5 xl:flex-row xl:items-end">
+          <div class="min-w-0">
+            <div class="mb-2 flex flex-wrap items-center gap-2 text-[13px] text-[#667085]">
+              <span class="rounded-full bg-[#EDE4FF] px-3 py-1 text-[12px] font-bold uppercase tracking-wide text-eventra">Step 3 of 5</span>
+              <span class="text-slate-300">•</span>
+              <span>Draft Auto-Saved at <span id="lastSaved">10:48 AM</span></span>
+            </div>
+            <h1 class="text-[30px] font-extrabold leading-tight tracking-[-.035em] text-navy sm:text-[34px]">Create Event: <span id="eventTitle" class="text-eventra">"Tech Conference 2026"</span></h1>
+            <p class="mt-2 max-w-3xl text-[15px] leading-6 text-[#596579]">Set up ticket tiers, currency, pricing in Nigerian Naira (₦), quantities, and sales windows.</p>
+          </div>
+          <div class="flex flex-wrap gap-3 xl:justify-end">
+            <button id="previewBtn" type="button" class="inline-flex min-h-[46px] items-center justify-center gap-2 rounded-xl border border-slate-100 bg-white px-5 text-[14px] font-semibold text-[#263850] shadow-sm transition hover:bg-slate-50">
+              <span class="text-eventra">◉</span> Preview Portal
+            </button>
+            <button id="guidelinesBtn" type="button" class="inline-flex min-h-[46px] items-center justify-center gap-2 rounded-xl border border-slate-100 bg-white px-5 text-[14px] font-semibold text-[#263850] shadow-sm transition hover:bg-slate-50">
+              <span class="text-slate-500">ⓘ</span> Organizer Guidelines
+            </button>
+          </div>
+        </section>
+
+        <!-- Five-step progress -->
+        <section class="mb-6 overflow-x-auto rounded-[16px] border border-[#EDF0F6] bg-white p-5 shadow-panel sm:p-6">
+          <div class="stepper-inner relative grid min-w-[700px] grid-cols-5 gap-2 px-1">
+            <div class="step-line"></div>
+            <div class="step-progress"></div>
+
+            <a href="../03_Create%20Event/index.html" class="relative z-10 flex flex-col items-center gap-2 text-center">
+              <span class="grid h-[34px] w-[34px] place-items-center rounded-full bg-eventra text-[15px] font-bold text-white">✓</span>
+              <span class="text-[14px] font-bold text-[#263850]">1. Basic Info</span>
+              <span class="-mt-1 text-[12px] font-semibold text-eventra">COMPLETED</span>
+            </a>
+
+            <a href="../04_Creat%20Event_Step%202/index.html" class="relative z-10 flex flex-col items-center gap-2 text-center">
+              <span class="grid h-[34px] w-[34px] place-items-center rounded-full bg-eventra text-[15px] font-bold text-white">✓</span>
+              <span class="text-[14px] font-bold text-[#263850]">2. Date &amp; Location</span>
+              <span class="-mt-1 text-[12px] font-semibold text-eventra">COMPLETED</span>
+            </a>
+
+            <div class="relative z-10 flex flex-col items-center gap-2 text-center" aria-current="step">
+              <span class="grid h-[34px] w-[34px] place-items-center rounded-full bg-[#5B00E8] text-[15px] font-bold text-white shadow-md shadow-purple-200">3</span>
+              <span class="text-[14px] font-bold text-eventra">3. Tickets &amp; Pricing</span>
+              <span class="-mt-1 rounded-full bg-[#EDE4FF] px-3 py-1 text-[12px] font-semibold text-eventra">In Progress</span>
+            </div>
+
+            <div class="relative z-10 flex flex-col items-center gap-2 text-center">
+              <span class="grid h-[34px] w-[34px] place-items-center rounded-full bg-[#EAF0FC] text-[14px] font-bold text-[#8793A8]">4</span>
+              <span class="text-[14px] font-semibold text-[#7A8497]">4. Review</span>
+              <span class="-mt-1 text-[12px] text-[#A2A9B7]">Summary Check</span>
+            </div>
+
+            <div class="relative z-10 flex flex-col items-center gap-2 text-center">
+              <span class="grid h-[34px] w-[34px] place-items-center rounded-full bg-[#EAF0FC] text-[14px] font-bold text-[#8793A8]">5</span>
+              <span class="text-[14px] font-semibold text-[#7A8497]">5. Publish</span>
+              <span class="-mt-1 text-[12px] text-[#A2A9B7]">Go Live</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- Currency and payout settings -->
+        <section class="mb-6 grid grid-cols-1 gap-4 rounded-[16px] border border-[#EDF0F6] bg-white p-5 shadow-panel md:grid-cols-[minmax(0,1fr)_minmax(270px,.75fr)] md:items-center sm:p-6">
+          <div class="flex items-start gap-4">
+            <span class="grid h-[46px] w-[46px] shrink-0 place-items-center rounded-xl bg-[#E7EEFF] text-[24px] text-eventra">▣</span>
+            <div>
+              <div class="flex flex-wrap items-center gap-2">
+                <h2 class="text-[17px] font-bold text-navy">Nigerian Naira (NGN – ₦)</h2>
+                <span class="rounded-full bg-[#EDE4FF] px-2.5 py-1 text-[12px] font-semibold text-eventra">◉ Paystack Automated Payouts</span>
+              </div>
+              <p class="mt-1 max-w-2xl text-[14px] leading-6 text-[#596579]">Local debit/credit cards, USSD, Apple Pay, and instant Bank Transfer enabled via Paystack. Funds settle to your connected account automatically.</p>
+            </div>
+          </div>
+          <div class="flex items-center justify-between gap-4 rounded-xl bg-[#F0F4FF] p-4">
+            <div>
+              <p class="text-[14px] font-semibold text-[#263850]">Pass fees to attendee</p>
+              <p class="text-[13px] leading-5 text-[#667085]">Paystack fee 1.5% + ₦100 added at checkout</p>
+            </div>
+            <label class="flex cursor-pointer items-center" aria-label="Pass fees to attendee">
+              <input id="passFees" type="checkbox" class="toggle-input sr-only" checked>
+              <span class="toggle-track"></span>
+            </label>
+          </div>
+        </section>
+
+        <!-- Ticket tiers heading -->
+        <section class="mb-4 flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
+          <div class="flex flex-wrap items-center gap-2">
+            <h2 class="text-[14px] font-extrabold uppercase tracking-wide text-[#263850]">Active Ticket Tiers (<span id="tierCount">3</span>)</h2>
+            <span class="text-slate-300">•</span>
+            <p class="text-[14px] text-[#667085]">Drag to reorder hierarchy</p>
+          </div>
+          <p id="tierReadyStatus" class="text-[13px] font-semibold text-eventra">All tiers active &amp; ready</p>
+        </section>
+
+        <!-- Ticket tiers rendered by JavaScript -->
+        <section id="ticketTierList" class="mb-4 flex flex-col gap-3" aria-label="Ticket tiers"></section>
+
+        <button id="addTierBtn" type="button" class="mb-6 flex min-h-[54px] w-full items-center justify-center gap-2 rounded-[14px] border border-[#EDF0F6] bg-white px-4 text-[15px] font-semibold text-eventra shadow-panel transition hover:border-purple-200 hover:bg-purple-50">
+          <span class="text-[21px] leading-none">⊕</span> Add Another Ticket Tier
+        </button>
+
+        <!-- Policy cards -->
+        <section class="mb-6 grid grid-cols-1 gap-4 lg:grid-cols-3">
+          <!-- Purchase limits -->
+          <article class="rounded-[16px] border border-[#EDF0F6] bg-white p-5 shadow-panel">
+            <div class="mb-3 flex items-center gap-3">
+              <span class="grid h-[38px] w-[38px] place-items-center rounded-xl bg-[#E7EEFF] text-[19px] text-eventra">♙</span>
+              <div>
+                <h3 class="text-[16px] font-bold text-navy">Purchase Limits</h3>
+                <p class="helper mt-1">Specify order volume bounds per checkout session.</p>
+              </div>
+            </div>
+            <div class="mt-5 grid grid-cols-2 gap-3">
+              <label>
+                <span class="mb-2 block text-[12px] font-bold uppercase tracking-wide text-[#667085]">Min / Order</span>
+                <select id="minOrder" class="field !py-2.5 text-[14px]">
+                  <option value="1">1 ticket</option>
+                  <option value="2">2 tickets</option>
+                  <option value="3">3 tickets</option>
+                  <option value="4">4 tickets</option>
+                  <option value="5">5 tickets</option>
+                </select>
+              </label>
+              <label>
+                <span class="mb-2 block text-[12px] font-bold uppercase tracking-wide text-[#667085]">Max / Order</span>
+                <select id="maxOrder" class="field !py-2.5 text-[14px]">
+                  <option value="1">1 ticket</option>
+                  <option value="2">2 tickets</option>
+                  <option value="3">3 tickets</option>
+                  <option value="4">4 tickets</option>
+                  <option value="5" selected>5 tickets</option>
+                  <option value="10">10 tickets</option>
+                  <option value="20">20 tickets</option>
+                </select>
+              </label>
+            </div>
+            <p id="orderLimitError" class="mt-2 hidden text-[13px] font-medium text-red-600">Maximum tickets must be at least the minimum.</p>
+          </article>
+
+          <!-- Transfer policy -->
+          <article class="rounded-[16px] border border-[#EDF0F6] bg-white p-5 shadow-panel">
+            <div class="mb-3 flex items-center gap-3">
+              <span class="grid h-[38px] w-[38px] place-items-center rounded-xl bg-[#E7EEFF] text-[19px] text-eventra">⇄</span>
+              <div>
+                <h3 class="text-[16px] font-bold text-navy">Transfer Policy</h3>
+                <p class="helper mt-1">Allow registered attendees to reassign and transfer tickets.</p>
+              </div>
+            </div>
+            <label class="mt-5 flex cursor-pointer items-center justify-between gap-3 rounded-xl bg-[#F0F4FF] p-3.5">
+              <span class="text-[14px] font-semibold text-[#263850]">Enable Transfers (Free)</span>
+              <span class="flex items-center">
+                <input id="enableTransfers" type="checkbox" class="toggle-input sr-only" checked>
+                <span class="toggle-track"></span>
+              </span>
+            </label>
+          </article>
+
+          <!-- Required details -->
+          <article class="rounded-[16px] border border-[#EDF0F6] bg-white p-5 shadow-panel">
+            <div class="mb-3 flex items-center gap-3">
+              <span class="grid h-[38px] w-[38px] place-items-center rounded-xl bg-[#E7EEFF] text-[19px] text-eventra">▣</span>
+              <div>
+                <h3 class="text-[16px] font-bold text-navy">Required Details</h3>
+                <p class="helper mt-1">Custom questions and contact fields captured at checkout.</p>
+              </div>
+            </div>
+            <div class="mt-4 flex flex-col gap-3">
+              <label class="flex cursor-pointer items-center gap-2.5 text-[14px] text-[#263850]">
+                <input type="checkbox" id="detailNameEmail" class="check-control" checked>
+                Full Name &amp; Individual Email
+              </label>
+              <label class="flex cursor-pointer items-center gap-2.5 text-[14px] text-[#263850]">
+                <input type="checkbox" id="detailJobOrg" class="check-control" checked>
+                Job Title &amp; Organization
+              </label>
+              <label class="flex cursor-pointer items-center gap-2.5 text-[14px] text-[#263850]">
+                <input type="checkbox" id="detailPhone" class="check-control" checked>
+                Mobile Phone (WhatsApp)
+              </label>
+            </div>
+          </article>
+        </section>
+
+        <!-- Revenue summary -->
+        <section class="mb-8 overflow-hidden rounded-[17px] bg-gradient-to-r from-[#081B31] via-[#0C2039] to-[#171C54] p-6 text-white shadow-xl sm:p-7">
+          <div class="summary-numbers flex items-center justify-between gap-5">
+            <div>
+              <p class="text-[12px] font-semibold uppercase tracking-wide text-slate-300">Total Event Capacity</p>
+              <div class="mt-1 flex flex-wrap items-baseline gap-2">
+                <span id="totalCapacity" class="text-[38px] font-extrabold tracking-tight sm:text-[42px]">500</span>
+                <span class="text-[14px] text-slate-300">seats reserved</span>
+              </div>
+            </div>
+            <div class="text-left sm:text-right">
+              <p class="text-[12px] font-semibold uppercase tracking-wide text-slate-300">Potential Gross Revenue</p>
+              <p id="grossRevenue" class="mt-1 text-[32px] font-extrabold tracking-tight text-[#FFD7A5] sm:text-[40px]">₦20,250,000</p>
+            </div>
+          </div>
+          <div class="mt-6 flex flex-col justify-between gap-3 border-t border-white/10 pt-5 sm:flex-row sm:items-center">
+            <p class="text-[13px] leading-6 text-slate-300">
+              <span class="mr-2 text-[#C9B7FF]">▣</span>
+              Estimated Paystack Payout:
+              <strong id="estimatedPayout" class="font-bold text-white">₦20,250,000</strong>
+              <span id="feeNote">(Attendee absorbs 1.5% + ₦100 fee)</span>
+            </p>
+            <span class="inline-flex w-fit items-center gap-2 rounded-full bg-emerald-400/10 px-3 py-2 text-[12px] font-semibold text-emerald-100">
+              <span class="text-emerald-300">◉</span> Instant T+1 Payout Ready
+            </span>
+          </div>
+        </section>
+
+        <!-- Bottom actions -->
+        <footer class="footer-actions flex items-center justify-between gap-4 pb-8">
+          <button id="backBtn" type="button" class="inline-flex min-h-[46px] items-center gap-2 rounded-xl bg-[#E5EDFF] px-5 text-[14px] font-semibold text-[#263850] transition hover:bg-[#D8E4FF]">
+            <span class="text-lg">←</span> Back: Date &amp; Location
+          </button>
+          <div class="flex items-center gap-3">
+            <button id="saveDraftBtn" type="button" class="inline-flex min-h-[46px] items-center gap-2 rounded-xl border border-[#E5EAF4] bg-white px-5 text-[14px] font-semibold text-[#263850] transition hover:bg-slate-50">
+              <span>▣</span> Save Draft
+            </button>
+            <button id="nextBtn" type="button" class="inline-flex min-h-[46px] items-center gap-2 rounded-xl bg-eventra px-5 text-[14px] font-semibold text-white shadow-lg shadow-purple-200 transition hover:bg-[#5B00E8]">
+              Next: Review &amp; Publish <span class="text-lg">→</span>
+            </button>
+          </div>
+        </footer>
+      </main>
+    </div>
+  </div>
+
+  <!-- Edit ticket modal -->
+  <div id="tierModal" class="fixed inset-0 z-[70] hidden items-center justify-center bg-slate-950/50 p-4">
+    <div class="w-full max-w-xl rounded-2xl bg-white p-6 shadow-2xl">
+      <div class="mb-5 flex items-start justify-between gap-3">
+        <div>
+          <h2 id="tierModalTitle" class="text-xl font-bold text-navy">Edit ticket tier</h2>
+          <p class="mt-1 text-[14px] text-slate-500">Update the ticket name, price, quantity, and sales window.</p>
+        </div>
+        <button id="closeTierModal" type="button" class="icon-button" aria-label="Close editor">✕</button>
+      </div>
+      <form id="tierForm" class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <input type="hidden" id="editingTierId">
+        <label class="sm:col-span-2">
+          <span class="field-label">Ticket name *</span>
+          <input id="tierNameInput" class="field" maxlength="60" required placeholder="e.g. VIP Fast-Track & Lounge">
+        </label>
+        <label>
+          <span class="field-label">Price (₦) *</span>
+          <input id="tierPriceInput" class="field" type="number" min="0" step="100" required placeholder="40000">
+        </label>
+        <label>
+          <span class="field-label">Ticket quantity *</span>
+          <input id="tierQuantityInput" class="field" type="number" min="1" step="1" required placeholder="100">
+        </label>
+        <label>
+          <span class="field-label">Sales start date</span>
+          <input id="tierStartInput" class="field" type="date">
+        </label>
+        <label>
+          <span class="field-label">Sales end date</span>
+          <input id="tierEndInput" class="field" type="date">
+        </label>
+        <label class="sm:col-span-2">
+          <span class="field-label">Included benefits (comma separated)</span>
+          <input id="tierBenefitsInput" class="field" placeholder="Front Row Seating, Lounge Access">
+        </label>
+        <div class="mt-2 flex justify-end gap-3 sm:col-span-2">
+          <button id="cancelTierEdit" type="button" class="min-h-[44px] rounded-xl border border-slate-200 px-5 text-[14px] font-semibold text-slate-700 hover:bg-slate-50">Cancel</button>
+          <button type="submit" class="min-h-[44px] rounded-xl bg-eventra px-5 text-[14px] font-semibold text-white hover:bg-[#5B00E8]">Save Ticket Tier</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast" role="status" aria-live="polite" class="toast fixed bottom-5 right-5 z-[90] hidden max-w-[calc(100vw-40px)] rounded-xl bg-navy px-5 py-4 text-[14px] font-medium text-white shadow-2xl"></div>
+
+  <script src="./script.js"></script>
+</body>
+</html>

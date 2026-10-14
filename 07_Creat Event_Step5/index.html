@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#081B31">
+  <title>Event Published — Eventra Organizer</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ["Inter", "Arial", "Helvetica", "sans-serif"]
+          },
+          colors: {
+            eventra: "#6D28FF",
+            navy: "#081B31",
+            page: "#F5F7FC",
+            ink: "#10223B"
+          },
+          boxShadow: {
+            soft: "0 8px 24px rgba(16, 34, 59, 0.06)"
+          }
+        }
+      }
+    };
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+  <style>
+    * { box-sizing: border-box; }
+    html { min-height: 100%; scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Inter, Arial, Helvetica, sans-serif;
+      font-style: normal;
+      background: #F5F7FC;
+      color: #10223B;
+    }
+    button, input, textarea, select {
+      font: inherit;
+      font-style: normal;
+    }
+    button, a { -webkit-tap-highlight-color: transparent; }
+    button { cursor: pointer; }
+    .sidebar-scroll { scrollbar-width: none; }
+    .sidebar-scroll::-webkit-scrollbar { display: none; }
+    .progress-track { background: #E6EAF5; }
+    .progress-fill { background: #6D28FF; }
+    .live-gradient {
+      background:
+        radial-gradient(circle at 100% 100%, rgba(109,40,255,.95), transparent 40%),
+        radial-gradient(circle at 0% 100%, rgba(255,173,56,.18), transparent 35%),
+        linear-gradient(115deg, #1C2C40 0%, #0D1C30 65%, #172342 100%);
+    }
+    .qr-canvas canvas, .qr-canvas img {
+      display: block;
+      width: 100% !important;
+      height: auto !important;
+      image-rendering: pixelated;
+    }
+    .toast-visible {
+      opacity: 1 !important;
+      transform: translate(-50%, 0) !important;
+      pointer-events: auto !important;
+    }
+    @media (max-width: 1023px) {
+      .desktop-sidebar { display: none; }
+    }
+    @media (min-width: 1024px) {
+      .mobile-header { display: none; }
+    }
+    @media (max-width: 640px) {
+      .live-title { font-size: 30px !important; line-height: 1.15 !important; }
+      .page-heading { font-size: 30px !important; }
+    }
+  </style>
+
+  <!-- Eventra shared organizer layout alignment -->
+  <link rel="stylesheet" href="../shared/eventra-shell.css">
+</head>
+
+<body class="bg-page font-sans text-ink antialiased" data-eventra-nav="events">
+<script src="../shared/eventra-shell.js"></script>
+
+ 
+
+  <!-- MOBILE NAVIGATION -->
+  
+  
+  <!-- DESKTOP SIDEBAR -->
+  
+  <!-- MAIN CONTENT -->
+  <main class="min-h-screen w-full">
+    <!-- DESKTOP HEADER -->
+    
+    <div class="mx-auto w-full max-w-[1600px] px-4 pb-10 pt-5 sm:px-6 lg:px-6 lg:pt-7 xl:px-7">
+      <!-- PAGE INTRO -->
+      <section class="mb-6 flex flex-col justify-between gap-5 xl:flex-row xl:items-end">
+        <div class="min-w-0">
+          <div class="mb-4 flex flex-wrap items-center gap-3">
+            <span class="inline-flex items-center gap-2 rounded-full bg-[#EEE8FF] px-3 py-1.5 text-[12px] font-extrabold uppercase tracking-wide text-eventra">
+              <span class="flex h-5 w-5 items-center justify-center rounded-full bg-eventra text-[11px] text-white">✓</span>Step 5 of 5
+            </span>
+            <span class="h-1 w-1 rounded-full bg-slate-300"></span>
+            <span class="text-[15px] font-medium text-slate-500">Your event is published</span>
+          </div>
+          <h1 class="page-heading text-[34px] font-bold leading-tight tracking-[-.8px] text-[#0D2038] sm:text-[38px]">Event Published &amp; Live</h1>
+          <p class="mt-2 max-w-3xl text-[15px] leading-6 text-slate-600">Your event is now live. Share the event link and start welcoming attendees.</p>
+        </div>
+        <div class="flex flex-col gap-3 sm:flex-row">
+          <button id="previewEventButton" type="button" class="inline-flex min-h-[44px] items-center justify-center gap-2 rounded-xl bg-[#E6EEFF] px-5 py-3 text-[15px] font-semibold text-[#263850] transition hover:bg-[#D9E5FF]"><span>↗</span>Preview Live Event</button>
+          <button id="editEventButton" type="button" class="inline-flex min-h-[44px] items-center justify-center gap-2 rounded-xl bg-eventra px-5 py-3 text-[15px] font-semibold text-white shadow-lg shadow-purple-200 transition hover:bg-purple-700"><span>⚙</span>Edit Event Settings</button>
+        </div>
+      </section>
+
+      <!-- COMPLETED STEPS -->
+      <section class="mb-6 rounded-2xl border border-slate-100 bg-white px-4 py-6 shadow-soft sm:px-7">
+        <div class="relative">
+          <div class="progress-track absolute left-[5%] right-[5%] top-[22px] h-1 rounded-full"></div>
+          <div class="progress-fill absolute left-[5%] right-[5%] top-[22px] h-1 rounded-full"></div>
+          <div class="relative grid grid-cols-5 gap-1">
+            <div class="flex min-w-0 flex-col items-center text-center"><span class="z-10 flex h-11 w-11 items-center justify-center rounded-full bg-eventra text-xl font-bold text-white shadow-md shadow-purple-200">✓</span><span class="mt-3 text-[12px] font-bold text-navy sm:text-[13px]">1. Basic Info</span></div>
+            <div class="flex min-w-0 flex-col items-center text-center"><span class="z-10 flex h-11 w-11 items-center justify-center rounded-full bg-eventra text-xl font-bold text-white shadow-md shadow-purple-200">✓</span><span class="mt-3 text-[12px] font-bold text-navy sm:text-[13px]">2. Date &amp; Venue</span></div>
+            <div class="flex min-w-0 flex-col items-center text-center"><span class="z-10 flex h-11 w-11 items-center justify-center rounded-full bg-eventra text-xl font-bold text-white shadow-md shadow-purple-200">✓</span><span class="mt-3 text-[12px] font-bold text-navy sm:text-[13px]">3. Tickets</span></div>
+            <div class="flex min-w-0 flex-col items-center text-center"><span class="z-10 flex h-11 w-11 items-center justify-center rounded-full bg-eventra text-xl font-bold text-white shadow-md shadow-purple-200">✓</span><span class="mt-3 text-[12px] font-bold text-navy sm:text-[13px]">4. Review</span></div>
+            <div class="flex min-w-0 flex-col items-center text-center"><span class="z-10 flex h-11 w-11 items-center justify-center rounded-full bg-eventra text-xl font-bold text-white shadow-md shadow-purple-200">✦</span><span class="mt-3 text-[12px] font-extrabold text-eventra sm:text-[13px]">5. Live on Eventra 🎉</span></div>
+          </div>
+        </div>
+        <p class="mt-6 text-center text-[15px] leading-6 text-slate-600">Congratulations! <strong id="progressEventName" class="font-bold text-navy">Tech Conference 2026</strong> is officially live across the Eventra network.</p>
+      </section>
+
+      <!-- SUCCESS HERO -->
+      <section class="live-gradient mb-6 overflow-hidden rounded-2xl px-5 py-7 text-white shadow-xl sm:px-8 sm:py-8 lg:px-9 lg:py-9">
+        <div class="grid gap-8 lg:grid-cols-[minmax(0,1fr)_300px] lg:items-center xl:grid-cols-[minmax(0,1fr)_340px]">
+          <div>
+            <span class="inline-flex items-center gap-2 rounded-full bg-white/15 px-3 py-2 text-[12px] font-bold uppercase tracking-wide text-white"><span class="h-2 w-2 rounded-full bg-emerald-400"></span>🎉 Event is officially live &amp; selling</span>
+            <h2 class="live-title mt-5 max-w-3xl text-[40px] font-extrabold leading-[1.1] tracking-[-1.2px] sm:text-[46px] xl:text-[50px]"><span id="heroEventName">Tech Conference 2026</span><br>is Live!</h2>
+            <p class="mt-4 max-w-2xl text-[15px] leading-6 text-slate-200 sm:text-[16px]">Your event details are ready to share with attendees. Use the public link and QR code below to promote your event.</p>
+            <div class="mt-5 flex flex-wrap gap-3">
+              <span class="inline-flex items-center gap-2 rounded-lg bg-white/10 px-3 py-2 text-[13px] font-semibold text-slate-100">◉ Status: <span class="text-emerald-300">Published</span></span>
+              <span class="inline-flex items-center gap-2 rounded-lg bg-white/10 px-3 py-2 text-[13px] font-semibold text-slate-100">▣ Capacity: <span id="heroCapacity">500 Tickets</span></span>
+              <span class="inline-flex items-center gap-2 rounded-lg bg-white/10 px-3 py-2 text-[13px] font-semibold text-slate-100">⌖ <span id="heroVenue">Landmark Centre, Lagos</span></span>
+            </div>
+          </div>
+          <div class="rounded-2xl border border-white/10 bg-white/10 p-5 shadow-lg backdrop-blur-sm sm:p-6">
+            <div class="flex items-center justify-between gap-3"><p class="text-[12px] font-bold uppercase tracking-wide text-slate-300">Potential Gross Sales</p><span class="rounded-full bg-amber-200 px-3 py-1 text-[11px] font-extrabold text-amber-950">Target</span></div>
+            <p id="grossSales" class="mt-4 break-words text-[30px] font-extrabold leading-tight sm:text-[32px]">₦20,250,000</p>
+            <p id="capacityNote" class="mt-2 text-[13px] text-slate-300">100% capacity value</p>
+            <div class="mt-4 h-2 overflow-hidden rounded-full bg-white/20"><div class="h-full w-[3%] rounded-full bg-amber-200"></div></div>
+            <button id="salesStreamButton" type="button" class="mt-5 flex min-h-[46px] w-full items-center justify-center gap-2 rounded-xl bg-white px-4 py-3 text-[14px] font-bold text-navy transition hover:bg-slate-100">Go to Sales Stream <span>↗</span></button>
+          </div>
+        </div>
+      </section>
+
+      <!-- MAIN CARDS -->
+      <div class="grid items-start gap-6 xl:grid-cols-[minmax(0,1.65fr)_minmax(310px,.85fr)]">
+        <div class="min-w-0 space-y-6">
+          <!-- PUBLIC EVENT LINK -->
+          <section class="rounded-2xl border border-slate-100 bg-white p-5 shadow-soft sm:p-6">
+            <div class="flex flex-col justify-between gap-3 sm:flex-row sm:items-start">
+              <div class="flex items-start gap-3">
+                <span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#EEE8FF] text-xl text-eventra">↗</span>
+                <div><h3 class="text-[18px] font-bold text-navy">Public Event Link</h3><p class="mt-1 text-[15px] leading-6 text-slate-600">Share this link with attendees, community channels, and sponsors.</p></div>
+              </div>
+              <span class="inline-flex w-fit items-center gap-2 rounded-lg bg-emerald-50 px-3 py-2 text-[12px] font-bold text-emerald-700"><span class="h-2 w-2 rounded-full bg-emerald-500"></span>Published</span>
+            </div>
+            <div class="mt-5 flex flex-col gap-3 rounded-xl bg-[#EEF2FF] p-3 sm:flex-row sm:items-center">
+              <span class="hidden text-lg text-eventra sm:block">◎</span>
+              <input id="publicEventLink" type="text" readonly value="https://eventra.ng/e/tech-conference-2026-89241" aria-label="Public event link" class="min-w-0 flex-1 border-0 bg-transparent px-1 py-2 text-[14px] font-semibold text-navy outline-none focus:ring-0">
+              <div class="grid grid-cols-2 gap-2 sm:flex">
+                <button id="copyLinkButton" type="button" class="inline-flex min-h-[42px] items-center justify-center gap-2 rounded-lg bg-eventra px-4 py-2 text-[14px] font-bold text-white transition hover:bg-purple-700">▢ Copy Link</button>
+                <button id="previewLinkButton" type="button" class="inline-flex min-h-[42px] items-center justify-center gap-2 rounded-lg bg-[#DCE8FF] px-4 py-2 text-[14px] font-bold text-navy transition hover:bg-[#CFDEFF]">Preview ↗</button>
+              </div>
+            </div>
+            <div class="mt-6">
+              <h4 class="mb-3 text-[13px] font-bold uppercase tracking-wide text-slate-500">Broadcast to social channels</h4>
+              <div class="flex flex-wrap gap-2.5">
+                <button data-share="whatsapp" type="button" class="inline-flex min-h-[42px] items-center gap-2 rounded-xl bg-[#E4F9EE] px-3.5 py-2 text-[13px] font-semibold text-[#146C43] transition hover:bg-[#D3F4E2]">▣ WhatsApp</button>
+                <button data-share="x" type="button" class="inline-flex min-h-[42px] items-center gap-2 rounded-xl bg-[#E7EEFF] px-3.5 py-2 text-[13px] font-semibold text-navy transition hover:bg-[#D9E5FF]">𝕏 X (Twitter)</button>
+                <button data-share="linkedin" type="button" class="inline-flex min-h-[42px] items-center gap-2 rounded-xl bg-[#E7EEFF] px-3.5 py-2 text-[13px] font-semibold text-navy transition hover:bg-[#D9E5FF]">▣ LinkedIn</button>
+                <button data-share="stories" type="button" class="inline-flex min-h-[42px] items-center gap-2 rounded-xl bg-[#FFF4E3] px-3.5 py-2 text-[13px] font-semibold text-[#85520C] transition hover:bg-[#FFECCD]">◉ Stories</button>
+                <button data-share="email" type="button" class="inline-flex min-h-[42px] items-center gap-2 rounded-xl bg-[#E7EEFF] px-3.5 py-2 text-[13px] font-semibold text-navy transition hover:bg-[#D9E5FF]">✉ Email Blast</button>
+              </div>
+            </div>
+          </section>
+
+          <!-- QR CODE -->
+          <section class="rounded-2xl border border-slate-100 bg-white p-5 shadow-soft sm:p-6">
+            <div class="grid gap-5 sm:grid-cols-[112px_minmax(0,1fr)] sm:items-center lg:grid-cols-[128px_minmax(0,1fr)]">
+              <div class="mx-auto flex h-[128px] w-[128px] items-center justify-center rounded-2xl bg-[#EEF2FF] p-3 sm:mx-0 sm:h-[112px] sm:w-[112px] lg:h-[128px] lg:w-[128px]">
+                <div id="qrCode" class="qr-canvas flex h-full w-full items-center justify-center overflow-hidden rounded-lg bg-white p-1" aria-label="QR code for the public event link"></div>
+              </div>
+              <div class="min-w-0">
+                <div class="mb-2 flex flex-wrap items-center gap-2"><h3 class="text-[18px] font-bold text-navy">Physical Marketing QR Flyer</h3><span class="rounded-full bg-[#E9E8FF] px-2.5 py-1 text-[11px] font-bold text-indigo-800">Print Ready</span></div>
+                <p class="text-[15px] leading-6 text-slate-600">Download or print a QR code for banners, badges, posters, and speaker presentations.</p>
+                <div class="mt-4 flex flex-col gap-2 sm:flex-row sm:flex-wrap">
+                  <button id="downloadQrButton" type="button" class="inline-flex min-h-[43px] items-center justify-center gap-2 rounded-xl bg-navy px-4 py-3 text-[14px] font-bold text-white transition hover:bg-slate-800">↓ Download QR Code</button>
+                  <button id="printQrButton" type="button" class="inline-flex min-h-[43px] items-center justify-center gap-2 rounded-xl bg-[#E6EEFF] px-4 py-3 text-[14px] font-bold text-navy transition hover:bg-[#D7E4FF]">▣ Print QR Flyer</button>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+
+        <!-- EVENT PREVIEW -->
+        <aside class="min-w-0 overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-soft">
+          <div class="relative h-[185px] overflow-hidden bg-gradient-to-br from-[#101A33] via-[#38206F] to-[#6D28FF]">
+            <img id="eventCoverImage" src="" alt="Event cover" class="absolute inset-0 hidden h-full w-full object-cover">
+            <div id="coverFallback" class="absolute inset-0 flex flex-col items-center justify-center px-5 text-center text-white"><span class="text-5xl">✦</span><span class="mt-2 text-[13px] font-bold uppercase tracking-[.18em] text-white/80">Eventra Live</span></div>
+            <div class="absolute inset-x-0 bottom-0 flex items-end justify-between gap-3 bg-gradient-to-t from-slate-950/80 to-transparent p-4 pt-12">
+              <span class="rounded-lg bg-emerald-500 px-3 py-1.5 text-[12px] font-extrabold text-white">LIVE &amp; ON SALE</span>
+              <span id="coverLocation" class="text-[13px] font-semibold text-white">Lagos, NG</span>
+            </div>
+          </div>
+          <div class="p-5 sm:p-6">
+            <h3 id="previewEventName" class="text-[21px] font-bold leading-tight text-navy">Tech Conference 2026</h3>
+            <p class="mt-1 text-[14px] text-slate-500">Organized by <span id="previewOrganizer">Apex Live Events</span></p>
+            <div class="mt-5 space-y-4">
+              <div class="flex items-start gap-3"><span class="mt-0.5 text-xl text-eventra">▣</span><div><p id="previewDate" class="text-[14px] font-semibold text-navy">Saturday, Oct 12, 2026</p><p id="previewTime" class="mt-1 text-[14px] text-slate-500">09:00 AM – 06:00 PM WAT</p></div></div>
+              <div class="flex items-start gap-3"><span class="mt-0.5 text-xl text-eventra">⌖</span><div><p id="previewVenue" class="text-[14px] font-semibold text-navy">Landmark Centre</p><p id="previewAddress" class="mt-1 text-[14px] leading-5 text-slate-500">Water Corporation Drive, Victoria Island</p></div></div>
+            </div>
+            <div class="mt-5 rounded-xl bg-[#EEF2FF] p-4">
+              <p class="mb-3 text-[12px] font-bold uppercase tracking-wide text-slate-500">Configured tiers</p>
+              <div id="ticketTiers" class="space-y-3"></div>
+            </div>
+            <div class="mt-4 flex items-start gap-3 rounded-xl bg-[#E6EEFF] p-4"><span class="text-xl text-emerald-600">▥</span><div><p class="text-[13px] font-bold text-navy">Payout account</p><p id="payoutDetails" class="mt-1 text-[13px] leading-5 text-slate-600">Payment account details will appear here when configured.</p></div></div>
+            <button id="editSettingsButton" type="button" class="mt-4 flex min-h-[44px] w-full items-center justify-center gap-2 rounded-xl bg-[#DCE8FF] px-4 py-3 text-[14px] font-bold text-navy transition hover:bg-[#CADBFF]">Edit Event Settings <span>⚙</span></button>
+          </div>
+        </aside>
+      </div>
+
+      <!-- BOTTOM ACTIONS -->
+      <section class="mt-7 rounded-2xl border border-slate-100 bg-white p-4 shadow-soft sm:p-5">
+        <div class="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
+          <div class="flex flex-col gap-3 sm:flex-row">
+            <a href="../02_Organizer%20Dashboard/index.html" class="inline-flex min-h-[44px] items-center justify-center gap-2 rounded-xl bg-[#E6EEFF] px-4 py-3 text-[14px] font-bold text-navy transition hover:bg-[#D7E4FF]">← Back to Organizer Dashboard</a>
+            <button id="createAnotherEventButton" type="button" class="inline-flex min-h-[44px] items-center justify-center gap-2 rounded-xl bg-[#EEF2FF] px-4 py-3 text-[14px] font-bold text-navy transition hover:bg-[#E0E8FF]">⊕ Create Another Event</button>
+          </div>
+          <button id="analyticsButton" type="button" class="inline-flex min-h-[48px] items-center justify-center gap-2 rounded-xl bg-eventra px-5 py-3 text-[14px] font-bold text-white shadow-lg shadow-purple-200 transition hover:bg-purple-700">↗ View Live Sales &amp; Analytics Dashboard 📊</button>
+        </div>
+      </section>
+
+      <footer class="py-7 text-center text-[13px] text-slate-500">Eventra Organizer Portal · Manage your event with confidence.</footer>
+    </div>
+  </main>
+
+  <!-- TOAST -->
+  <div id="toast" role="status" aria-live="polite" class="pointer-events-none fixed bottom-5 left-1/2 z-[100] w-[calc(100%-32px)] max-w-[420px] -translate-x-1/2 translate-y-3 rounded-xl bg-navy px-5 py-4 text-white opacity-0 shadow-2xl transition-all duration-200">
+    <p id="toastTitle" class="text-[14px] font-bold">Eventra</p>
+    <p id="toastMessage" class="mt-1 text-[14px] leading-5 text-slate-200">Action completed.</p>
+  </div>
+
+  <!-- SETTINGS MODAL -->
+  <div id="settingsModal" class="fixed inset-0 z-[80] hidden items-center justify-center bg-slate-950/50 p-4">
+    <section role="dialog" aria-modal="true" aria-labelledby="settingsModalTitle" class="max-h-[90vh] w-full max-w-xl overflow-y-auto rounded-2xl bg-white p-5 shadow-2xl sm:p-7">
+      <div class="flex items-start justify-between gap-4">
+        <div><h2 id="settingsModalTitle" class="text-[22px] font-bold text-navy">Event Settings</h2><p class="mt-1 text-[15px] text-slate-500">Update the details displayed on your event card.</p></div>
+        <button id="closeSettingsModal" type="button" aria-label="Close settings" class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-slate-100 text-xl text-slate-600 hover:bg-slate-200">×</button>
+      </div>
+      <form id="settingsForm" class="mt-6 space-y-4">
+        <label class="block"><span class="mb-2 block text-[14px] font-semibold text-navy">Event name</span><input id="settingsEventName" name="eventName" required maxlength="80" class="min-h-[46px] w-full rounded-xl border border-slate-200 px-4 text-[15px] outline-none focus:border-eventra focus:ring-2 focus:ring-purple-100"></label>
+        <label class="block"><span class="mb-2 block text-[14px] font-semibold text-navy">Venue name</span><input id="settingsVenue" name="venue" class="min-h-[46px] w-full rounded-xl border border-slate-200 px-4 text-[15px] outline-none focus:border-eventra focus:ring-2 focus:ring-purple-100"></label>
+        <label class="block"><span class="mb-2 block text-[14px] font-semibold text-navy">Venue address</span><input id="settingsAddress" name="address" class="min-h-[46px] w-full rounded-xl border border-slate-200 px-4 text-[15px] outline-none focus:border-eventra focus:ring-2 focus:ring-purple-100"></label>
+        <label class="block"><span class="mb-2 block text-[14px] font-semibold text-navy">Event date</span><input id="settingsDate" name="date" class="min-h-[46px] w-full rounded-xl border border-slate-200 px-4 text-[15px] outline-none focus:border-eventra focus:ring-2 focus:ring-purple-100"></label>
+        <label class="block"><span class="mb-2 block text-[14px] font-semibold text-navy">Public event link</span><input id="settingsLink" name="link" type="url" required class="min-h-[46px] w-full rounded-xl border border-slate-200 px-4 text-[15px] outline-none focus:border-eventra focus:ring-2 focus:ring-purple-100"></label>
+        <div class="flex flex-col-reverse gap-3 pt-2 sm:flex-row sm:justify-end">
+          <button id="cancelSettingsButton" type="button" class="min-h-[44px] rounded-xl bg-slate-100 px-5 py-3 text-[14px] font-bold text-slate-700 hover:bg-slate-200">Cancel</button>
+          <button type="submit" class="min-h-[44px] rounded-xl bg-eventra px-5 py-3 text-[14px] font-bold text-white hover:bg-purple-700">Save Changes</button>
+        </div>
+      </form>
+    </section>
+  </div>
+
+  <script src="./script.js"></script>
+</body>
+</html>

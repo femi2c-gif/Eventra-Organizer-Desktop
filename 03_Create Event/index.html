@@ -1,0 +1,1367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create Event — Eventra Organizer</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            eventra: "#6D28FF",
+            eventraNavy: "#071A2F"
+          },
+          fontFamily: {
+            sans: ["Inter", "Arial", "Helvetica", "sans-serif"]
+          }
+        }
+      }
+    };
+  </script>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+    :root {
+      --navy: #071A2F;
+      --purple: #6D28FF;
+      --purple-dark: #5B21E8;
+      --purple-soft: #EEE9FF;
+      --background: #F5F7FC;
+      --white: #FFFFFF;
+      --text: #10223B;
+      --muted: #68758A;
+      --border: #E4E9F2;
+      --input: #EEF3FF;
+      --green: #12B886;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-style: normal !important;
+    }
+
+    html,
+    body {
+      min-height: 100%;
+      font-family: Inter, Arial, Helvetica, sans-serif;
+      font-style: normal !important;
+      background: var(--background);
+      color: var(--text);
+    }
+
+    body * {
+      font-family: Inter, Arial, Helvetica, sans-serif !important;
+      font-style: normal !important;
+    }
+
+    button,
+    input,
+    textarea,
+    select {
+      font-family: Inter, Arial, Helvetica, sans-serif !important;
+      font-style: normal !important;
+    }
+
+    button {
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      overflow-x: hidden;
+    }
+
+    .app {
+      min-height: 100vh;
+      display: flex;
+      background: var(--background);
+    }
+
+    /* SIDEBAR */
+
+    .sidebar {
+      position: fixed;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 250px;
+      background: var(--navy);
+      color: #ffffff;
+      padding: 18px 18px 20px;
+      display: flex;
+      flex-direction: column;
+      z-index: 100;
+    }
+
+    .brand {
+      height: 52px;
+      display: flex;
+      align-items: flex-start;
+      padding-left: 8px;
+      margin-bottom: 25px;
+    }
+
+    .brand img {
+      width: 138px;
+      height: auto;
+      object-fit: contain;
+      object-position: left center;
+      display: block;
+    }
+
+    .workspace-label {
+      margin: 0 12px 13px;
+      color: #C5D0DE;
+      font-size: 14px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      line-height: 1.4;
+    }
+
+    .nav {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .nav-link {
+      min-height: 44px;
+      display: flex;
+      align-items: center;
+      gap: 13px;
+      padding: 0 12px;
+      border-radius: 11px;
+      color: #D3DCE8;
+      text-decoration: none;
+      font-size: 17px;
+      font-weight: 500;
+      transition: 0.18s ease;
+    }
+
+    .nav-link:hover {
+      background: rgba(255, 255, 255, 0.07);
+      color: #ffffff;
+    }
+
+    .nav-link.active {
+      background: var(--purple);
+      color: #ffffff;
+      font-weight: 600;
+      box-shadow: 0 6px 18px rgba(109, 40, 255, 0.22);
+    }
+
+    .nav-icon {
+      width: 20px;
+      height: 20px;
+      display: grid;
+      place-items: center;
+      flex: 0 0 20px;
+      font-size: 18px;
+      line-height: 1;
+    }
+
+    .portal-card {
+      margin-top: auto;
+      min-height: 65px;
+      padding: 10px 11px;
+      border-radius: 11px;
+      background: #18314C;
+      display: flex;
+      align-items: center;
+      gap: 9px;
+    }
+
+    .portal-card .bolt {
+      color: #FFD65A;
+      font-size: 20px;
+    }
+
+    .portal-title {
+      color: #ffffff;
+      font-size: 14px;
+      font-weight: 700;
+      line-height: 1.35;
+    }
+
+    .portal-sub {
+      margin-top: 2px;
+      color: #C0CAD7;
+      font-size: 13px;
+      line-height: 1.4;
+    }
+
+    .portal-settings {
+      margin-left: auto;
+      color: #D8E1EC;
+      font-size: 18px;
+    }
+
+    /* MAIN */
+
+    .main {
+      width: calc(100% - 250px);
+      margin-left: 250px;
+      min-height: 100vh;
+      padding: 35px 30px 70px;
+    }
+
+    .content {
+      width: min(100%, 1320px);
+      margin: 0 auto;
+    }
+
+    /* PAGE HEADER */
+
+    .page-top {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 25px;
+      margin-bottom: 26px;
+    }
+
+    .eyebrow-row {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 11px;
+      margin-bottom: 9px;
+    }
+
+    .step-pill {
+      min-height: 26px;
+      padding: 0 11px;
+      display: inline-flex;
+      align-items: center;
+      border-radius: 999px;
+      background: var(--purple-soft);
+      color: var(--purple);
+      font-size: 12px;
+      font-weight: 800;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .eyebrow-dot {
+      width: 5px;
+      height: 5px;
+      flex: 0 0 5px;
+      border-radius: 50%;
+      background: #C8CAD3;
+    }
+
+    .autosave {
+      color: #697388;
+      font-size: 14px;
+      font-weight: 500;
+      line-height: 1.5;
+    }
+
+    h1 {
+      margin: 0;
+      color: #0D2038;
+      font-size: 34px;
+      line-height: 1.15;
+      letter-spacing: -0.7px;
+      font-weight: 700;
+    }
+
+    .subtitle {
+      margin-top: 7px;
+      color: #657187;
+      font-size: 15px;
+      line-height: 1.5;
+      font-weight: 400;
+    }
+
+    .top-actions {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      padding-bottom: 1px;
+    }
+
+    .ghost-btn {
+      min-height: 42px;
+      padding: 0 15px;
+      border: 0;
+      border-radius: 10px;
+      background: #EAF1FF;
+      color: #263850;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      transition: background 0.18s ease;
+    }
+
+    .ghost-btn:hover {
+      background: #E1EAFC;
+    }
+
+    /* STEPPER */
+
+    .stepper-card {
+      margin-bottom: 26px;
+      padding: 19px 22px 17px;
+      background: #ffffff;
+      border: 1px solid #EDF0F6;
+      border-radius: 15px;
+      box-shadow: 0 2px 8px rgba(17, 35, 61, 0.035);
+    }
+
+    .stepper {
+      position: relative;
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      min-height: 80px;
+    }
+
+    .step-line {
+      position: absolute;
+      left: 20px;
+      right: 20px;
+      top: 17px;
+      height: 4px;
+      border-radius: 99px;
+      background: #E5ECFB;
+    }
+
+    .step-progress {
+      position: absolute;
+      left: 20px;
+      top: 17px;
+      width: 10.5%;
+      height: 4px;
+      border-radius: 99px;
+      background: var(--purple);
+      transition: 0.25s ease;
+    }
+
+    .step {
+      position: relative;
+      z-index: 2;
+      min-width: 0;
+      display: flex;
+      align-items: center;
+      flex-direction: column;
+      gap: 8px;
+      text-align: center;
+    }
+
+    .step-number {
+      width: 34px;
+      height: 34px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: #EAF0FC;
+      color: #758198;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .step.active .step-number,
+    .step.completed .step-number {
+      background: var(--purple);
+      color: #ffffff;
+    }
+
+    .step-label {
+      color: #5B6578;
+      font-size: 14px;
+      line-height: 1.35;
+      font-weight: 600;
+      white-space: normal;
+    }
+
+    .step.active .step-label {
+      color: var(--purple);
+      font-weight: 700;
+    }
+
+    .step-note {
+      margin-top: -5px;
+      color: #858DA0;
+      font-size: 12px;
+      line-height: 1.35;
+    }
+
+    .step.active .step-note {
+      color: #777F91;
+    }
+
+    /* FORM CARD */
+
+    .form-card {
+      overflow: hidden;
+      background: #ffffff;
+      border: 1px solid #EDF0F6;
+      border-radius: 15px;
+      box-shadow: 0 2px 8px rgba(17, 35, 61, 0.035);
+    }
+
+    .form-inner {
+      padding: 27px 28px 22px;
+    }
+
+    .section-heading {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      padding-bottom: 16px;
+      margin-bottom: 26px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .section-title-wrap {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .section-icon {
+      width: 36px;
+      height: 36px;
+      flex: 0 0 36px;
+      display: grid;
+      place-items: center;
+      border-radius: 10px;
+      background: #EEE8FF;
+      color: var(--purple);
+      font-size: 18px;
+    }
+
+    .section-title {
+      color: #14263D;
+      font-size: 18px;
+      font-weight: 700;
+      line-height: 1.3;
+    }
+
+    .section-sub {
+      margin-top: 3px;
+      color: #697388;
+      font-size: 15px;
+      line-height: 1.55;
+      font-weight: 400;
+    }
+
+    .visibility {
+      min-height: 30px;
+      padding: 0 11px;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      border-radius: 999px;
+      background: #F0F4FA;
+      color: #677286;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .visibility-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #10B981;
+    }
+
+    /* FORM FIELDS */
+
+    .fields {
+      display: grid;
+      grid-template-columns: minmax(0, 1.55fr) minmax(0, 0.85fr);
+      gap: 22px;
+    }
+
+    .field {
+      min-width: 0;
+    }
+
+    .field.full {
+      grid-column: 1 / -1;
+    }
+
+    label {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 8px;
+      color: #1D2D43;
+      font-size: 15px;
+      line-height: 1.4;
+      font-weight: 700;
+    }
+
+    .required {
+      color: #F04444;
+    }
+
+    .counter {
+      color: #7A8395;
+      font-size: 13px;
+      font-weight: 500;
+      white-space: nowrap;
+    }
+
+    input,
+    textarea,
+    select {
+      width: 100%;
+      min-width: 0;
+      outline: none;
+      border: 1px solid transparent;
+      border-radius: 10px;
+      background: var(--input);
+      color: #263951;
+      font-size: 15px;
+      font-weight: 400;
+      transition: 0.18s ease;
+    }
+
+    input {
+      height: 44px;
+      padding: 0 13px;
+    }
+
+    textarea {
+      min-height: 100px;
+      padding: 12px 13px;
+      resize: vertical;
+      line-height: 1.55;
+    }
+
+    select {
+      height: 44px;
+      padding: 0 38px 0 13px;
+      appearance: none;
+      background-image:
+        linear-gradient(45deg, transparent 50%, #56647A 50%),
+        linear-gradient(135deg, #56647A 50%, transparent 50%);
+      background-position:
+        calc(100% - 16px) 18px,
+        calc(100% - 11px) 18px;
+      background-size: 5px 5px, 5px 5px;
+      background-repeat: no-repeat;
+    }
+
+    input:focus,
+    textarea:focus,
+    select:focus {
+      border-color: #C7B9FF;
+      box-shadow: 0 0 0 3px rgba(109, 40, 255, 0.07);
+      background: #F5F7FF;
+    }
+
+    input::placeholder,
+    textarea::placeholder {
+      color: #8A95A8;
+      opacity: 1;
+    }
+
+    .event-name-wrap {
+      position: relative;
+    }
+
+    .event-name-wrap input {
+      padding-right: 45px;
+    }
+
+    .verified-mark {
+      position: absolute;
+      right: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--purple);
+      font-size: 15px;
+      font-weight: 800;
+      pointer-events: none;
+    }
+
+    /* IMAGE AREA */
+
+    .media-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 17px;
+      margin-top: 24px;
+    }
+
+    .preview {
+      position: relative;
+      height: 170px;
+      overflow: hidden;
+      border-radius: 13px;
+      background: #101C31;
+    }
+
+    .preview img {
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: cover;
+    }
+
+    .preview::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(
+          to top,
+          rgba(2, 13, 28, 0.82),
+          rgba(2, 13, 28, 0.02) 65%
+        );
+      pointer-events: none;
+    }
+
+    .preview-info {
+      position: absolute;
+      left: 15px;
+      right: 15px;
+      bottom: 13px;
+      z-index: 2;
+      color: #ffffff;
+    }
+
+    .preview-badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin-bottom: 5px;
+    }
+
+    .preview-badge {
+      padding: 4px 7px;
+      border-radius: 999px;
+      background: var(--purple);
+      font-size: 11px;
+      font-weight: 800;
+    }
+
+    .preview-size {
+      padding: 4px 7px;
+      border-radius: 999px;
+      background: #E8ECF2;
+      color: #2C3545;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .preview-name {
+      color: #ffffff;
+      font-size: 17px;
+      font-weight: 700;
+      line-height: 1.25;
+    }
+
+    .preview-location {
+      margin-top: 3px;
+      color: #E4E8F0;
+      font-size: 13px;
+      line-height: 1.4;
+    }
+
+    .upload {
+      min-height: 170px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      text-align: center;
+      border: 1px dashed #C8D2E5;
+      border-radius: 13px;
+      background: #EEF3FF;
+      color: #59667C;
+      padding: 15px;
+      transition: border-color 0.18s ease, background 0.18s ease;
+    }
+
+    .upload.dragging {
+      border-color: var(--purple);
+      background: #E8E0FF;
+    }
+
+    .upload-icon {
+      width: 42px;
+      height: 42px;
+      display: grid;
+      place-items: center;
+      margin-bottom: 8px;
+      border-radius: 10px;
+      background: #E7DEFF;
+      color: var(--purple);
+      font-size: 22px;
+    }
+
+    .upload-title {
+      color: #26374D;
+      font-size: 15px;
+      font-weight: 700;
+    }
+
+    .upload-sub {
+      margin-top: 4px;
+      color: #788397;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .upload-actions {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 11px;
+    }
+
+    .upload-btn {
+      min-height: 34px;
+      padding: 0 13px;
+      border: 0;
+      border-radius: 999px;
+      background: #ffffff;
+      color: var(--purple);
+      font-size: 13px;
+      font-weight: 700;
+      box-shadow: 0 1px 3px rgba(15, 32, 56, 0.04);
+    }
+
+    .browse {
+      color: #8791A3;
+      font-size: 13px;
+    }
+
+    .hidden-file {
+      display: none;
+    }
+
+    /* TAGS */
+
+    .tags-field {
+      margin-top: 24px;
+    }
+
+    .tag-input {
+      min-height: 44px;
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 7px;
+      padding: 5px 10px;
+      border-radius: 10px;
+      background: var(--input);
+    }
+
+    .tag {
+      min-height: 30px;
+      padding: 0 9px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      border-radius: 999px;
+      background: #ffffff;
+      color: var(--purple);
+      font-size: 13px;
+      font-weight: 700;
+      box-shadow: 0 1px 2px rgba(30, 42, 62, 0.04);
+    }
+
+    .tag button {
+      min-height: auto;
+      border: 0;
+      padding: 0;
+      background: none;
+      color: #8992A2;
+      font-size: 17px;
+      line-height: 1;
+    }
+
+    .tag-text {
+      flex: 1;
+      min-width: 130px;
+      height: 32px;
+      padding: 0 3px;
+      border: 0 !important;
+      outline: 0 !important;
+      background: transparent !important;
+      box-shadow: none !important;
+      font-size: 15px;
+    }
+
+    .tag-hint {
+      margin-top: 7px;
+      color: #697488;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    /* FOOTER */
+
+    .form-footer {
+      min-height: 76px;
+      padding: 13px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      border-top: 1px solid var(--border);
+    }
+
+    .save-btn {
+      min-height: 42px;
+      padding: 0 16px;
+      border: 0;
+      border-radius: 9px;
+      background: #E7EEFC;
+      color: #23354D;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .save-btn:hover {
+      background: #DDE8FA;
+    }
+
+    .footer-right {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 17px;
+    }
+
+    .next-note {
+      color: #6B7384;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .next-btn {
+      min-height: 44px;
+      padding: 0 17px;
+      border: 0;
+      border-radius: 10px;
+      background: var(--purple);
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      font-size: 14px;
+      font-weight: 700;
+      box-shadow: 0 7px 16px rgba(109, 40, 255, 0.18);
+    }
+
+    .next-btn:hover {
+      background: var(--purple-dark);
+    }
+
+    /* TOAST */
+
+    .toast {
+      position: fixed;
+      right: 25px;
+      bottom: 24px;
+      z-index: 500;
+      max-width: calc(100vw - 32px);
+      padding: 13px 16px;
+      border-radius: 10px;
+      background: #12243A;
+      color: #ffffff;
+      font-size: 14px;
+      line-height: 1.5;
+      font-weight: 600;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.18);
+      transform: translateY(20px);
+      opacity: 0;
+      pointer-events: none;
+      transition: 0.25s ease;
+    }
+
+    .toast.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    /* RESPONSIVE */
+
+    @media (max-width: 1100px) {
+      .sidebar {
+        width: 220px;
+      }
+
+      .main {
+        width: calc(100% - 220px);
+        margin-left: 220px;
+        padding-left: 22px;
+        padding-right: 22px;
+      }
+
+      .fields {
+        grid-template-columns: 1fr;
+      }
+
+      .field.full {
+        grid-column: auto;
+      }
+    }
+
+    @media (max-width: 800px) {
+      .app {
+        display: block;
+      }
+
+      .sidebar {
+        position: static;
+        width: 100%;
+        min-height: auto;
+        padding: 10px 12px;
+      }
+
+      .brand {
+        height: 42px;
+        margin-bottom: 8px;
+      }
+
+      .brand img {
+        width: 138px;
+      }
+
+      .workspace-label {
+        display: none;
+      }
+
+      .nav {
+        flex-direction: row;
+        overflow-x: auto;
+        padding-bottom: 4px;
+      }
+
+      .nav-link {
+        flex: 0 0 auto;
+        min-height: 42px;
+        padding: 0 12px;
+        font-size: 15px;
+      }
+
+      .portal-card {
+        display: none;
+      }
+
+      .main {
+        width: 100%;
+        margin: 0;
+        padding: 24px 16px 40px;
+      }
+
+      .page-top {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 15px;
+      }
+
+      h1 {
+        font-size: 34px;
+        line-height: 1.15;
+      }
+
+      .subtitle {
+        font-size: 15px;
+      }
+
+      .top-actions {
+        width: 100%;
+      }
+
+      .top-actions .ghost-btn {
+        flex: 1 1 180px;
+        justify-content: center;
+      }
+
+      .stepper-card {
+        overflow-x: auto;
+        padding: 17px 12px 13px;
+      }
+
+      .stepper {
+        min-width: 620px;
+      }
+
+      .form-inner {
+        padding: 22px 17px;
+      }
+
+      .section-heading {
+        align-items: flex-start;
+      }
+
+      .visibility {
+        white-space: normal;
+      }
+
+      .media-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .form-footer {
+        align-items: stretch;
+        flex-direction: column;
+      }
+
+      .footer-right {
+        justify-content: space-between;
+      }
+
+      .next-btn {
+        justify-content: center;
+      }
+
+      .toast {
+        left: 16px;
+        right: 16px;
+        bottom: 16px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .main {
+        padding: 20px 12px 32px;
+      }
+
+      h1 {
+        font-size: 34px;
+      }
+
+      .eyebrow-row {
+        gap: 8px;
+      }
+
+      .autosave {
+        font-size: 13px;
+      }
+
+      .top-actions {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .top-actions .ghost-btn {
+        width: 100%;
+        flex: auto;
+      }
+
+      .stepper {
+        min-width: 580px;
+      }
+
+      .section-heading {
+        flex-direction: column;
+      }
+
+      .section-title {
+        font-size: 17px;
+      }
+
+      .section-sub {
+        font-size: 15px;
+      }
+
+      .fields {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .field.full {
+        grid-column: auto;
+      }
+
+      .footer-right {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+      }
+
+      .next-note {
+        text-align: left;
+      }
+
+      .save-btn,
+      .next-btn {
+        width: 100%;
+      }
+    }
+  </style>
+
+  <!-- Eventra shared organizer layout alignment -->
+  <link rel="stylesheet" href="../shared/eventra-shell.css">
+<style id="eventra-shell-overrides">
+/* Layout is offset by the shared shell (body padding), not by the page. */
+.main { width: 100% !important; margin-left: 0 !important; }
+</style>
+</head>
+
+<body data-eventra-nav="events">
+<script src="../shared/eventra-shell.js"></script>
+  <div class="app">
+
+    <!-- SIDEBAR -->
+
+
+
+    <!-- MAIN -->
+    <main class="main">
+      <div class="content">
+
+        <!-- HEADER -->
+        <section class="page-top">
+          <div>
+            <div class="eyebrow-row">
+              <span class="step-pill" id="stepPill">Step 1 of 5</span>
+              <span class="eyebrow-dot"></span>
+              <span class="autosave" id="autosave">Draft Auto-Saved</span>
+            </div>
+
+            <h1
+            class="text-[34px] font-bold leading-[1.1] tracking-[-0.7px] text-[#0D2038]"
+            >
+             Create Event
+            </h1>
+
+            <p class="subtitle">
+              Set up your event details, ticketing tiers, and publishing preferences.
+            </p>
+          </div>
+
+          <div class="top-actions">
+            <button class="ghost-btn" type="button" id="previewBtn">
+              <span>◉</span>
+              Preview Portal
+            </button>
+
+            <button class="ghost-btn" type="button" id="guidelinesBtn">
+              <span>?</span>
+              Organizer Guidelines
+            </button>
+          </div>
+        </section>
+
+        <!-- STEPPER -->
+        <section class="stepper-card" aria-label="Event creation progress">
+          <div class="stepper">
+            <div class="step-line"></div>
+            <div class="step-progress" id="stepProgress"></div>
+
+            <div class="step active" data-step="1">
+              <div class="step-number">1</div>
+              <div class="step-label">Basic Info</div>
+              <div class="step-note">In Progress</div>
+            </div>
+
+            <div class="step" data-step="2">
+              <div class="step-number">2</div>
+              <div class="step-label">Date &amp; Location</div>
+              <div class="step-note">Next</div>
+            </div>
+
+            <div class="step" data-step="3">
+              <div class="step-number">3</div>
+              <div class="step-label">Tickets &amp; Pricing</div>
+              <div class="step-note">Tiers &amp; Pricing</div>
+            </div>
+
+            <div class="step" data-step="4">
+              <div class="step-number">4</div>
+              <div class="step-label">Review Details</div>
+              <div class="step-note">Summary</div>
+            </div>
+
+            <div class="step" data-step="5">
+              <div class="step-number">5</div>
+              <div class="step-label">Publish &amp; Go Live</div>
+              <div class="step-note">Go Live</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- FORM -->
+        <section class="form-card">
+          <div class="form-inner">
+
+            <!-- GENERAL INFORMATION -->
+            <div class="section-heading">
+              <div class="section-title-wrap">
+                <div class="section-icon">▤</div>
+                <div>
+                  <div class="section-title">General Information</div>
+                  <div class="section-sub">
+                    Provide key metadata that appears on attendee discover cards and search feeds.
+                  </div>
+                </div>
+              </div>
+
+              <div class="visibility">
+                <span class="visibility-dot"></span>
+                Public Visibility
+              </div>
+            </div>
+
+            <!-- FIELDS -->
+            <div class="fields">
+
+              <!-- EVENT NAME -->
+              <div class="field">
+                <label for="eventName">
+                  <span>Event Name <span class="required">*</span></span>
+                  <span class="counter" id="nameCounter">20/80</span>
+                </label>
+
+                <div class="event-name-wrap">
+                  <input
+                    id="eventName"
+                    type="text"
+                    maxlength="80"
+                    value="Tech Conference 2026"
+                    autocomplete="off"
+                    required
+                  >
+                  <span class="verified-mark">◉</span>
+                </div>
+              </div>
+
+              <!-- CATEGORY -->
+              <div class="field">
+                <label for="category">
+                  <span>Category <span class="required">*</span></span>
+                </label>
+
+                <select id="category" required>
+                  <option value="Technology">Technology</option>
+                  <option value="Music">Music</option>
+                  <option value="Business">Business</option>
+                  <option value="Arts & Culture">Arts Culture</option>
+                  <option value="Sports">Sports</option>
+                  <option value="Food & Lifestyle">Food Lifestyle</option>
+                  <option value="Education">Education</option>
+                </select>
+              </div>
+
+              <!-- DESCRIPTION -->
+              <div class="field full">
+                <label for="description">
+                  <span>Short Description <span class="required">*</span></span>
+                  <span class="counter" id="descriptionCounter">0/300 chars</span>
+                </label>
+
+                <textarea
+                  id="description"
+                  maxlength="300"
+                  required
+                >A conference for innovators, builders and changemakers featuring premier tech leaders across Nigeria and Africa.</textarea>
+              </div>
+            </div>
+
+            <!-- COVER IMAGE -->
+            <div class="media-grid">
+              <div class="preview">
+                <img
+                  id="previewImage"
+                  src="./Tech Conference 2026.png"
+                  alt="Event cover preview"
+                  onerror="this.style.display='none'"
+                >
+
+                <div class="preview-info">
+                  <div class="preview-badges">
+                    <span class="preview-badge">FEATURED EVENT</span>
+                    <span class="preview-size" id="imageSize">Cover image</span>
+                  </div>
+
+                  <div class="preview-name" id="previewName">Tech Conference 2026</div>
+                  <div class="preview-location">Event cover preview</div>
+                </div>
+              </div>
+
+              <div class="upload" id="uploadArea">
+                <div class="upload-icon">↑</div>
+                <div class="upload-title">Upload event cover image</div>
+                <div class="upload-sub">PNG, JPG or WebP · Maximum 10MB</div>
+
+                <div class="upload-actions">
+                  <button class="upload-btn" type="button" id="uploadBtn">
+                    Choose Image
+                  </button>
+                  <span class="browse">or drag and drop</span>
+                </div>
+
+                <input
+                  class="hidden-file"
+                  id="imageInput"
+                  type="file"
+                  accept="image/png,image/jpeg,image/webp"
+                >
+              </div>
+            </div>
+
+            <!-- TAGS -->
+            <div class="tags-field">
+              <label for="tagText">
+                <span>Event Tags</span>
+              </label>
+
+              <div class="tag-input" id="tagInput">
+                <input
+                  class="tag-text"
+                  id="tagText"
+                  type="text"
+                  placeholder="Type a tag and press Enter"
+                  autocomplete="off"
+                >
+              </div>
+
+              <div class="tag-hint">
+                Add keywords to help attendees discover your event.
+              </div>
+            </div>
+          </div>
+
+          <!-- FOOTER -->
+          <div class="form-footer">
+            <button class="save-btn" type="button" id="saveDraftBtn">
+              Save Draft
+            </button>
+
+            <div class="footer-right">
+              <span class="next-note">Step 1 of 5 · Basic Info</span>
+
+              <button class="next-btn" type="button" id="nextBtn">
+                Save Continue
+                <span aria-hidden="true">→</span>
+              </button>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script src="script.js"></script>
+</body>
+</html>

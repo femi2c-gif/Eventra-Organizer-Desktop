@@ -1,0 +1,7 @@
+{
+  "cleanUrls": true,
+  "trailingSlash": true,
+  "redirects": [
+    { "source": "/", "destination": "/01_Sign In/", "permanent": false }
+  ]
+}

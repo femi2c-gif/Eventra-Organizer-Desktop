@@ -1,0 +1,14 @@
+.DS_Store
+**/.DS_Store
+*.log
+node_modules/
+.vercel
+
+# Markdown files (README.md is the only exception)
+**/*.md
+!README.md
+
+# Claude / project guidance packs
+.claude/
+eventra_project_guidance_pack/
+eventra_project_guidance_pack 2/

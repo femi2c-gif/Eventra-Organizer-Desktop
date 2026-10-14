@@ -1,0 +1,2196 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <meta
+        name="description"
+        content="Sign in to Eventra"
+    >
+
+    <title>Eventra | Sign In</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        /* =====================================================
+           GLOBAL
+        ====================================================== */
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            min-height: 100%;
+        }
+
+        body {
+            min-height: 100vh;
+            background: #F6F7FB;
+            color: #172033;
+
+            font-family:
+                Arial,
+                Helvetica,
+                sans-serif;
+
+            font-style: normal !important;
+
+            overflow-x: hidden;
+        }
+
+        *,
+        *::before,
+        *::after {
+            font-family:
+                Arial,
+                Helvetica,
+                sans-serif !important;
+
+            font-style: normal !important;
+        }
+
+        button,
+        input,
+        a {
+            font-family:
+                Arial,
+                Helvetica,
+                sans-serif !important;
+
+            font-style: normal !important;
+        }
+
+        button {
+            cursor: pointer;
+        }
+
+
+        /* =====================================================
+           DESKTOP APP
+        ====================================================== */
+
+        .page {
+            width: 100%;
+            min-height: 100vh;
+
+            display: flex;
+            flex-direction: column;
+
+            background: #F6F7FB;
+        }
+
+
+        /* =====================================================
+           MAIN SIGN-IN AREA
+        ====================================================== */
+
+        .main-content {
+            width: 100%;
+            flex: 1;
+
+            display: flex;
+
+            min-height: calc(100vh - 72px);
+        }
+
+
+        /* =====================================================
+           LEFT HERO
+        ====================================================== */
+
+        .hero-panel {
+            position: relative;
+
+            width: 43%;
+
+            min-height: calc(100vh - 72px);
+
+            overflow: hidden;
+
+            background-image:
+                linear-gradient(
+                    to bottom,
+                    rgba(37, 0, 94, 0.20),
+                    rgba(7, 24, 47, 0.72)
+                ),
+                url("./eventra-welcome-bg.png");
+
+            background-size: cover;
+
+            background-position:
+                center center;
+
+            background-repeat: no-repeat;
+
+            color: white;
+        }
+
+
+        /* Additional dark/purple overlay */
+
+        .hero-panel::after {
+            content: "";
+
+            position: absolute;
+
+            inset: 0;
+
+            background:
+                linear-gradient(
+                    180deg,
+                    rgba(48, 4, 115, 0.08) 0%,
+                    rgba(50, 4, 130, 0.15) 35%,
+                    rgba(7, 24, 47, 0.68) 100%
+                );
+
+            pointer-events: none;
+        }
+
+
+        /* =====================================================
+           HERO CONTENT
+        ====================================================== */
+
+        .hero-content {
+            position: relative;
+
+            z-index: 2;
+
+            height: 100%;
+
+            min-height: calc(100vh - 72px);
+
+            padding:
+                42px
+                48px
+                40px
+                48px;
+
+            display: flex;
+            flex-direction: column;
+        }
+
+
+        /* =====================================================
+           TOP BADGE
+        ====================================================== */
+
+        .hero-badge {
+            width: fit-content;
+
+            display: inline-flex;
+            align-items: center;
+
+            gap: 7px;
+
+            padding:
+                5px
+                12px;
+
+            border-radius: 999px;
+
+            background:
+                rgba(255, 255, 255, 0.13);
+
+            border:
+                1px solid
+                rgba(255, 255, 255, 0.18);
+
+            color: white;
+
+            font-size: 11px;
+
+            line-height: 1;
+
+            font-weight: 600;
+
+            letter-spacing: 0.1px;
+        }
+
+
+        .hero-badge-dot {
+            width: 8px;
+            height: 8px;
+
+            border-radius: 50%;
+
+            background: #FFD447;
+
+            flex-shrink: 0;
+        }
+
+
+        /* =====================================================
+           LOGO
+        ====================================================== */
+
+        .hero-logo {
+            width: 175px;
+
+            height: auto;
+
+            object-fit: contain;
+
+            display: block;
+
+            margin-top: 82px;
+
+            margin-bottom: 72px;
+        }
+
+
+        /* =====================================================
+           HERO HEADLINE
+        ====================================================== */
+
+        .hero-title {
+            margin: 0;
+
+            max-width: 570px;
+
+            color: #FFFFFF;
+
+            font-size:
+                clamp(
+                    42px,
+                    4vw,
+                    66px
+                );
+
+            line-height: 0.98;
+
+            /*
+                Reduced from very heavy bold.
+                This keeps the same clean Eventra
+                appearance without looking too thick.
+            */
+
+            font-weight: 600;
+
+            letter-spacing: -2.2px;
+
+            font-style: normal !important;
+        }
+
+
+        /* =====================================================
+           HERO DESCRIPTION
+        ====================================================== */
+
+        .hero-description {
+            margin-top: 24px;
+
+            max-width: 510px;
+
+            color:
+                rgba(255, 255, 255, 0.88);
+
+            font-size: 16px;
+
+            line-height: 1.55;
+
+            font-weight: 400;
+
+            letter-spacing: 0;
+
+            font-style: normal !important;
+        }
+
+
+        /* =====================================================
+           FEATURE EVENT CARD
+        ====================================================== */
+
+        .hero-event-card {
+            width: min(100%, 475px);
+
+            margin-top: 30px;
+
+            padding:
+                15px
+                16px;
+
+            border-radius: 14px;
+
+            background:
+                rgba(10, 32, 62, 0.91);
+
+            border:
+                1px solid
+                rgba(255, 255, 255, 0.06);
+
+            display: flex;
+            align-items: center;
+
+            gap: 13px;
+
+            box-shadow:
+                0 12px 30px
+                rgba(0, 0, 0, 0.18);
+        }
+
+
+        .event-icon {
+            width: 48px;
+            height: 48px;
+
+            border-radius: 9px;
+
+            background: #6230F5;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            flex-shrink: 0;
+        }
+
+
+        .event-icon svg {
+            width: 25px;
+            height: 25px;
+
+            color: white;
+        }
+
+
+        .event-info {
+            min-width: 0;
+            flex: 1;
+        }
+
+
+        .event-top-line {
+            display: flex;
+            align-items: center;
+
+            gap: 6px;
+
+            margin-bottom: 4px;
+
+            white-space: nowrap;
+        }
+
+
+        .selling-fast {
+            color: #FFFFFF;
+
+            font-size: 10px;
+
+            font-weight: 700;
+
+            text-transform: uppercase;
+        }
+
+
+        .event-location {
+            color:
+                rgba(255, 255, 255, 0.55);
+
+            font-size: 10px;
+
+            overflow: hidden;
+
+            text-overflow: ellipsis;
+        }
+
+
+        .event-name {
+            color: white;
+
+            font-size: 18px;
+
+            line-height: 1.15;
+
+            font-weight: 600;
+        }
+
+
+        .event-booked {
+            margin-top: 3px;
+
+            color:
+                rgba(255, 255, 255, 0.65);
+
+            font-size: 11px;
+
+            font-weight: 400;
+        }
+
+
+        .event-price {
+            text-align: right;
+
+            flex-shrink: 0;
+        }
+
+
+        .event-price strong {
+            display: block;
+
+            color: #FFD36A;
+
+            font-size: 16px;
+
+            font-weight: 700;
+        }
+
+
+        .event-price span {
+            display: block;
+
+            margin-top: 3px;
+
+            color:
+                rgba(255, 255, 255, 0.58);
+
+            font-size: 10px;
+        }
+
+
+        /* =====================================================
+           RATING
+        ====================================================== */
+
+        .hero-rating {
+            width: fit-content;
+
+            margin-top: 16px;
+
+            padding:
+                6px
+                11px;
+
+            border-radius: 999px;
+
+            background:
+                rgba(28, 47, 76, 0.82);
+
+            border:
+                1px solid
+                rgba(255, 255, 255, 0.12);
+
+            display: flex;
+            align-items: center;
+
+            gap: 7px;
+        }
+
+
+        .rating-avatars {
+            display: flex;
+            align-items: center;
+        }
+
+
+        .rating-avatar {
+            width: 27px;
+            height: 27px;
+
+            margin-left: -5px;
+
+            border-radius: 50%;
+
+            border:
+                2px solid
+                rgba(255, 255, 255, 0.75);
+
+            background: #EEF2FF;
+
+            color: #23304A;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            font-size: 8px;
+
+            font-weight: 700;
+        }
+
+
+        .rating-avatar:first-child {
+            margin-left: 0;
+        }
+
+
+        .rating-star {
+            color: #FFD36A;
+
+            font-size: 14px;
+        }
+
+
+        .rating-text {
+            color:
+                rgba(255, 255, 255, 0.85);
+
+            font-size: 10px;
+
+            font-weight: 500;
+
+            white-space: nowrap;
+        }
+
+
+        /* =====================================================
+           RIGHT PANEL
+        ====================================================== */
+
+        .form-panel {
+            width: 57%;
+
+            min-height: calc(100vh - 72px);
+
+            background: #F6F7FB;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            padding:
+                32px
+                48px;
+        }
+
+
+        /* =====================================================
+           FORM CARD
+        ====================================================== */
+
+        .form-card {
+            width: 100%;
+
+            max-width: 585px;
+
+            background: white;
+
+            padding:
+                42px
+                48px
+                40px;
+
+            border-radius: 0;
+
+            box-shadow:
+                0 1px 0
+                rgba(15, 23, 42, 0.01);
+        }
+
+
+        /* =====================================================
+           WELCOME BADGE
+        ====================================================== */
+
+        .welcome-badge {
+            width: fit-content;
+
+            display: inline-flex;
+            align-items: center;
+
+            gap: 6px;
+
+            padding:
+                6px
+                11px;
+
+            border-radius: 999px;
+
+            background: #EFE8FF;
+
+            color: #6230F5;
+
+            font-size: 11px;
+
+            font-weight: 700;
+
+            text-transform: uppercase;
+
+            letter-spacing: 0.2px;
+        }
+
+
+        /* =====================================================
+           FORM HEADING
+        ====================================================== */
+
+        .form-heading {
+            margin:
+                14px
+                0
+                0;
+
+            color: #102039;
+
+            font-size:
+                clamp(
+                    30px,
+                    2.8vw,
+                    38px
+                );
+
+            line-height: 1.08;
+
+            /*
+                Reduced weight.
+            */
+
+            font-weight: 600;
+
+            letter-spacing: -1.1px;
+
+            font-style: normal !important;
+        }
+
+
+        .form-subtitle {
+            margin-top: 8px;
+
+            color: #69738A;
+
+            font-size: 15px;
+
+            line-height: 1.45;
+
+            font-weight: 400;
+        }
+
+
+        /* =====================================================
+           FORM
+        ====================================================== */
+
+        .login-form {
+            margin-top: 28px;
+        }
+
+
+        .field {
+            margin-bottom: 18px;
+        }
+
+
+        .field-label {
+            display: block;
+
+            margin-bottom: 7px;
+
+            color: #172033;
+
+            font-size: 12px;
+
+            font-weight: 700;
+        }
+
+
+        .input-wrapper {
+            position: relative;
+        }
+
+
+        .input-icon {
+            position: absolute;
+
+            left: 14px;
+            top: 50%;
+
+            width: 19px;
+            height: 19px;
+
+            transform:
+                translateY(-50%);
+
+            color: #7C89A1;
+
+            pointer-events: none;
+        }
+
+
+        .form-input {
+            width: 100%;
+
+            height: 52px;
+
+            border:
+                1px solid
+                #E1E5ED;
+
+            border-radius: 10px;
+
+            background: #EEF2FF;
+
+            padding:
+                0
+                45px
+                0
+                43px;
+
+            color: #172033;
+
+            font-size: 14px;
+
+            font-weight: 400;
+
+            outline: none;
+
+            transition:
+                border-color 0.2s,
+                box-shadow 0.2s;
+        }
+
+
+        .form-input::placeholder {
+            color: #7C89A1;
+        }
+
+
+        .form-input:focus {
+            border-color: #6230F5;
+
+            box-shadow:
+                0 0 0 3px
+                rgba(98, 48, 245, 0.10);
+        }
+
+
+        .password-toggle {
+            position: absolute;
+
+            right: 11px;
+            top: 50%;
+
+            width: 35px;
+            height: 35px;
+
+            transform:
+                translateY(-50%);
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            border: 0;
+
+            background: transparent;
+
+            color: #7C89A1;
+
+            border-radius: 50%;
+        }
+
+
+        .password-toggle:hover {
+            background: #E5E9F4;
+
+            color: #6230F5;
+        }
+
+
+        /* =====================================================
+           ERRORS
+        ====================================================== */
+
+        .field-error {
+            margin-top: 5px;
+
+            color: #DC2626;
+
+            font-size: 11px;
+
+            font-weight: 500;
+        }
+
+
+        .login-error {
+            margin-top: 12px;
+
+            padding:
+                10px
+                12px;
+
+            border:
+                1px solid
+                #FECACA;
+
+            border-radius: 8px;
+
+            background: #FEF2F2;
+
+            color: #DC2626;
+
+            font-size: 12px;
+
+            line-height: 1.4;
+        }
+
+
+        .hidden {
+            display: none !important;
+        }
+
+
+        /* =====================================================
+           REMEMBER / FORGOT
+        ====================================================== */
+
+        .form-options {
+            margin-top: 2px;
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            gap: 20px;
+        }
+
+
+        .remember-label {
+            display: flex;
+            align-items: center;
+
+            gap: 8px;
+
+            color: #69738A;
+
+            font-size: 12px;
+
+            font-weight: 400;
+
+            cursor: pointer;
+        }
+
+
+        .remember-checkbox {
+            width: 17px;
+            height: 17px;
+
+            accent-color: #6230F5;
+
+            cursor: pointer;
+        }
+
+
+        .forgot-link {
+            color: #6230F5;
+
+            font-size: 12px;
+
+            font-weight: 600;
+
+            text-decoration: none;
+        }
+
+
+        .forgot-link:hover {
+            text-decoration: underline;
+        }
+
+
+        /* =====================================================
+           SIGN IN BUTTON
+        ====================================================== */
+
+        .sign-in-button {
+            width: 100%;
+
+            height: 52px;
+
+            margin-top: 21px;
+
+            border: 0;
+
+            border-radius: 10px;
+
+            background: #6230F5;
+
+            color: white;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            gap: 9px;
+
+            font-size: 16px;
+
+            /*
+                Medium/semi-bold instead of extremely bold.
+            */
+
+            font-weight: 600;
+
+            box-shadow:
+                0 10px 24px
+                rgba(98, 48, 245, 0.23);
+
+            transition:
+                background 0.2s,
+                transform 0.2s;
+        }
+
+
+        .sign-in-button:hover {
+            background: #5524E0;
+        }
+
+
+        .sign-in-button:active {
+            transform: scale(0.99);
+        }
+
+
+        .sign-in-button:disabled {
+            cursor: not-allowed;
+
+            opacity: 0.7;
+        }
+
+
+        /* =====================================================
+           DIVIDER
+        ====================================================== */
+
+        .divider {
+            margin:
+                20px
+                0;
+
+            display: flex;
+            align-items: center;
+
+            gap: 13px;
+        }
+
+
+        .divider-line {
+            flex: 1;
+
+            height: 1px;
+
+            background: #E1E5ED;
+        }
+
+
+        .divider-text {
+            color: #7C8497;
+
+            font-size: 10px;
+
+            font-weight: 600;
+
+            white-space: nowrap;
+        }
+
+
+        /* =====================================================
+           SOCIAL BUTTONS
+        ====================================================== */
+
+        .social-row {
+            display: grid;
+
+            grid-template-columns:
+                1fr
+                1fr;
+
+            gap: 9px;
+        }
+
+
+        .social-button {
+            height: 48px;
+
+            border: 0;
+
+            border-radius: 9px;
+
+            background: #EEF2FF;
+
+            color: #172033;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            gap: 9px;
+
+            font-size: 14px;
+
+            font-weight: 600;
+        }
+
+
+        .social-button:hover {
+            background: #E6EAF8;
+        }
+
+
+        .social-icon {
+            width: 18px;
+            height: 18px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            font-weight: 700;
+        }
+
+
+        .passkey-button {
+            width: 100%;
+
+            height: 48px;
+
+            margin-top: 8px;
+
+            border: 0;
+
+            border-radius: 9px;
+
+            background: #EEF2FF;
+
+            color: #6230F5;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            gap: 8px;
+
+            font-size: 13px;
+
+            font-weight: 600;
+        }
+
+
+        .passkey-button:hover {
+            background: #E5E9F9;
+        }
+
+
+        /* =====================================================
+           SECURITY NOTE
+        ====================================================== */
+
+        .security-note {
+            margin-top: 20px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            gap: 7px;
+
+            color: #69738A;
+
+            font-size: 10px;
+
+            font-weight: 500;
+        }
+
+
+        .security-icon {
+            color: #C48B00;
+
+            width: 14px;
+            height: 14px;
+        }
+
+
+        .security-dot {
+            color: #B8BDCA;
+        }
+
+
+        /* =====================================================
+           SIGN UP
+        ====================================================== */
+
+        .signup-box {
+            width: 100%;
+
+            height: 45px;
+
+            margin-top: 20px;
+
+            border-radius: 8px;
+
+            background: #EEF2FF;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            color: #69738A;
+
+            font-size: 12px;
+
+            font-weight: 400;
+        }
+
+
+        .signup-link {
+            margin-left: 5px;
+
+            color: #6230F5;
+
+            font-weight: 700;
+
+            text-decoration: none;
+        }
+
+
+        .signup-link:hover {
+            text-decoration: underline;
+        }
+
+
+        /* =====================================================
+           FOOTER
+        ====================================================== */
+
+        .footer {
+            width: 100%;
+
+            min-height: 72px;
+
+            padding:
+                0
+                40px;
+
+            background: white;
+
+            border-top:
+                1px solid
+                #E5E7EB;
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            gap: 20px;
+
+            color: #69738A;
+
+            font-size: 11px;
+        }
+
+
+        .footer-left {
+            display: flex;
+            align-items: center;
+
+            gap: 12px;
+
+            flex-wrap: wrap;
+        }
+
+
+        .footer-links {
+            display: flex;
+            align-items: center;
+
+            gap: 9px;
+        }
+
+
+        .footer-link {
+            color: #69738A;
+
+            text-decoration: none;
+        }
+
+
+        .footer-link:hover {
+            color: #6230F5;
+        }
+
+
+        .footer-dot {
+            color: #B9BFCA;
+        }
+
+
+        .location-pill {
+            padding:
+                6px
+                14px;
+
+            border-radius: 999px;
+
+            background: #EAF0FF;
+
+            color: #6230F5;
+
+            font-size: 10px;
+
+            font-weight: 600;
+
+            white-space: nowrap;
+        }
+
+
+        /* =====================================================
+           TABLET
+        ====================================================== */
+
+        @media (max-width: 1100px) and (min-width: 768px) {
+
+            .hero-panel {
+                width: 45%;
+            }
+
+            .form-panel {
+                width: 55%;
+
+                padding:
+                    28px
+                    28px;
+            }
+
+            .hero-content {
+                padding:
+                    35px
+                    32px
+                    35px;
+            }
+
+            .hero-logo {
+                margin-top: 65px;
+
+                margin-bottom: 55px;
+
+                width: 155px;
+            }
+
+            .hero-title {
+                font-size: 48px;
+
+                letter-spacing: -1.7px;
+            }
+
+            .form-card {
+                padding:
+                    34px
+                    35px;
+            }
+        }
+
+
+        /* =====================================================
+           MOBILE
+        ====================================================== */
+
+        @media (max-width: 767px) {
+
+            body {
+                background: #F6F7FB;
+            }
+
+
+            .page {
+                min-height: 100vh;
+            }
+
+
+            .main-content {
+                min-height: auto;
+
+                display: block;
+            }
+
+
+            /* Hero becomes the top section */
+
+            .hero-panel {
+                width: 100%;
+
+                min-height: 410px;
+
+                background-position:
+                    center center;
+            }
+
+
+            .hero-content {
+                min-height: 410px;
+
+                padding:
+                    28px
+                    24px
+                    30px;
+            }
+
+
+            .hero-badge {
+                font-size: 9px;
+
+                padding:
+                    5px
+                    10px;
+            }
+
+
+            .hero-logo {
+                width: 145px;
+
+                margin-top: 52px;
+
+                margin-bottom: 48px;
+            }
+
+
+            .hero-title {
+                max-width: 350px;
+
+                font-size: 40px;
+
+                line-height: 0.99;
+
+                letter-spacing: -1.5px;
+
+                font-weight: 600;
+            }
+
+
+            .hero-description {
+                margin-top: 18px;
+
+                font-size: 13px;
+
+                max-width: 340px;
+            }
+
+
+            .hero-event-card {
+                margin-top: 20px;
+
+                padding: 12px;
+            }
+
+
+            .event-icon {
+                width: 42px;
+                height: 42px;
+            }
+
+
+            .event-name {
+                font-size: 14px;
+            }
+
+
+            .event-price strong {
+                font-size: 13px;
+            }
+
+
+            .hero-rating {
+                margin-top: 12px;
+            }
+
+
+            /* Right form */
+
+            .form-panel {
+                width: 100%;
+
+                min-height: auto;
+
+                padding:
+                    30px
+                    18px
+                    35px;
+
+                display: block;
+            }
+
+
+            .form-card {
+                width: 100%;
+
+                max-width: none;
+
+                padding:
+                    28px
+                    20px
+                    30px;
+
+                border-radius: 0;
+            }
+
+
+            .form-heading {
+                font-size: 29px;
+
+                font-weight: 600;
+            }
+
+
+            .form-subtitle {
+                font-size: 13px;
+            }
+
+
+            .login-form {
+                margin-top: 25px;
+            }
+
+
+            .form-input {
+                height: 48px;
+            }
+
+
+            .sign-in-button {
+                height: 49px;
+
+                font-size: 14px;
+            }
+
+
+            .footer {
+                min-height: auto;
+
+                padding:
+                    18px
+                    20px;
+
+                flex-direction: column;
+
+                align-items: flex-start;
+
+                gap: 12px;
+            }
+
+
+            .footer-left {
+                gap: 8px;
+            }
+
+
+            .location-pill {
+                align-self: flex-start;
+            }
+        }
+    </style>
+</head>
+
+
+<body>
+
+<div class="page">
+
+    <!-- =====================================================
+         MAIN CONTENT
+    ====================================================== -->
+
+    <main class="main-content">
+
+
+        <!-- =================================================
+             LEFT HERO
+        ================================================== -->
+
+        <section class="hero-panel">
+
+            <div class="hero-content">
+
+
+                <!-- TOP BADGE -->
+
+                <div class="hero-badge">
+
+                    <span class="hero-badge-dot"></span>
+
+                    <span>
+                        NIGERIA'S #1 LIVE EVENTS & TICKETING
+                    </span>
+
+                </div>
+
+
+                <!-- LOGO -->
+
+                <img
+                    src="./eventra-logo-white.png"
+                    alt="Eventra"
+                    class="hero-logo"
+                >
+
+
+                <!-- HERO TITLE -->
+
+                <h2 class="hero-title">
+
+                    Experience the<br>
+                    electric energy of live<br>
+                    moments.
+
+                </h2>
+
+
+                <!-- DESCRIPTION -->
+
+                <p class="hero-description">
+
+                    Instant verifiable tickets, VIP access lounge passes,
+                    and unforgettable nightlife across Lagos, Abuja,
+                    and Port Harcourt.
+
+                </p>
+
+
+                <!-- FEATURED EVENT -->
+
+                <div class="hero-event-card">
+
+                    <div class="event-icon">
+
+                        <svg
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="1.8"
+                        >
+                            <rect
+                                x="4"
+                                y="5"
+                                width="16"
+                                height="14"
+                                rx="2"
+                            />
+
+                            <path
+                                d="M8 3v4M16 3v4M4 9h16"
+                            />
+
+                            <path
+                                d="M8 13h.01M12 13h.01M16 13h.01M8 16h.01M12 16h.01"
+                            />
+                        </svg>
+
+                    </div>
+
+
+                    <div class="event-info">
+
+                        <div class="event-top-line">
+
+                            <span class="selling-fast">
+                                SELLING FAST
+                            </span>
+
+                            <span>•</span>
+
+                            <span class="event-location">
+                                Eko Convention Centre
+                            </span>
+
+                        </div>
+
+
+                        <div class="event-name">
+                            Afrobeats Festival Lagos
+                        </div>
+
+
+                        <div class="event-booked">
+                            1,240+ tickets booked today
+                        </div>
+
+                    </div>
+
+
+                    <div class="event-price">
+
+                        <strong>
+                            ₦25,000
+                        </strong>
+
+                        <span>
+                            Tier 1
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <!-- RATING -->
+
+                <div class="hero-rating">
+
+                    <div class="rating-avatars">
+
+                        <div class="rating-avatar">
+                            AO
+                        </div>
+
+                        <div class="rating-avatar">
+                            EK
+                        </div>
+
+                        <div class="rating-avatar">
+                            TN
+                        </div>
+
+                    </div>
+
+
+                    <span class="rating-star">
+                        ★
+                    </span>
+
+
+                    <span class="rating-text">
+                        4.9 / 5 from 150,000+ Nigerian event-goers
+                    </span>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =================================================
+             RIGHT LOGIN PANEL
+        ================================================== -->
+
+        <section class="form-panel">
+
+            <div class="form-card">
+
+
+                <!-- WELCOME BADGE -->
+
+                <div class="welcome-badge">
+
+                    <svg
+                        width="13"
+                        height="13"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                    >
+                        <rect
+                            x="5"
+                            y="3"
+                            width="14"
+                            height="18"
+                            rx="2"
+                        />
+
+                        <path
+                            d="M9 7h6M9 11h6M9 15h3"
+                        />
+                    </svg>
+
+                    WELCOME BACK
+
+                </div>
+
+
+                <!-- HEADING -->
+
+                <h1 class="form-heading">
+
+                    Sign in 
+
+                </h1>
+
+
+                <p class="form-subtitle">
+
+                    Access your tickets, saved events, and live passes
+                    in Lagos and beyond.
+
+                </p>
+
+
+
+                <!-- =================================================
+                     LOGIN FORM
+                ================================================== -->
+
+                <form
+                    id="loginForm"
+                    class="login-form"
+                >
+
+
+                    <!-- EMAIL -->
+
+                    <div class="field">
+
+                        <label
+                            for="email"
+                            class="field-label"
+                        >
+                            Email or Phone Number
+                        </label>
+
+
+                        <div class="input-wrapper">
+
+                            <svg
+                                class="input-icon"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="1.7"
+                            >
+                                <rect
+                                    x="3"
+                                    y="5"
+                                    width="18"
+                                    height="14"
+                                    rx="2"
+                                />
+
+                                <path
+                                    d="m3 7 9 6 9-6"
+                                />
+                            </svg>
+
+
+                            <input
+                                id="email"
+                                name="email"
+                                type="email"
+                                autocomplete="email"
+                                placeholder="name@example.com or +234..."
+                                class="form-input"
+                                required
+                            >
+
+                        </div>
+
+
+                        <p
+                            id="emailError"
+                            class="field-error hidden"
+                        ></p>
+
+                    </div>
+
+
+
+                    <!-- PASSWORD -->
+
+                    <div class="field">
+
+                        <label
+                            for="password"
+                            class="field-label"
+                        >
+                            Password
+                        </label>
+
+
+                        <div class="input-wrapper">
+
+                            <svg
+                                class="input-icon"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="1.7"
+                            >
+                                <rect
+                                    x="4"
+                                    y="10"
+                                    width="16"
+                                    height="10"
+                                    rx="2"
+                                />
+
+                                <path
+                                    d="M8 10V7a4 4 0 0 1 8 0v3"
+                                />
+                            </svg>
+
+
+                            <input
+                                id="password"
+                                name="password"
+                                type="password"
+                                autocomplete="current-password"
+                                placeholder="Enter your password"
+                                class="form-input"
+                                required
+                            >
+
+
+                            <button
+                                id="togglePassword"
+                                type="button"
+                                class="password-toggle"
+                                aria-label="Show password"
+                            >
+
+                                <svg
+                                    id="eyeOpen"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="1.7"
+                                >
+                                    <path
+                                        d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12z"
+                                    />
+
+                                    <circle
+                                        cx="12"
+                                        cy="12"
+                                        r="3"
+                                    />
+                                </svg>
+
+
+                                <svg
+                                    id="eyeClosed"
+                                    class="hidden"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="1.7"
+                                >
+                                    <path d="M3 3l18 18" />
+
+                                    <path
+                                        d="M10.6 10.6a2 2 0 0 0 2.8 2.8"
+                                    />
+
+                                    <path
+                                        d="M9.9 5.1A10.8 10.8 0 0 1 12 5c6.5 0 10 7 10 7a17.4 17.4 0 0 1-3 3.8"
+                                    />
+
+                                    <path
+                                        d="M6.6 6.6C3.8 8.4 2 12 2 12s3.5 7 10 7c1.6 0 3-.4 4.2-1"
+                                    />
+                                </svg>
+
+                            </button>
+
+                        </div>
+
+
+                        <p
+                            id="passwordError"
+                            class="field-error hidden"
+                        ></p>
+
+                    </div>
+
+
+
+                    <!-- OPTIONS -->
+
+                    <div class="form-options">
+
+                        <label class="remember-label">
+
+                            <input
+                                id="rememberMe"
+                                type="checkbox"
+                                class="remember-checkbox"
+                            >
+
+                            <span>
+                                Remember me
+                            </span>
+
+                        </label>
+
+
+                        <a
+                            href="../06_Forgot Password/index.html"
+                            class="forgot-link"
+                        >
+                            Forgot Password?
+                        </a>
+
+                    </div>
+
+
+
+                    <!-- API ERROR -->
+
+                    <div
+                        id="loginError"
+                        class="login-error hidden"
+                    ></div>
+
+
+
+                    <!-- SIGN IN -->
+
+                    <button
+                        id="signInButton"
+                        type="submit"
+                        class="sign-in-button"
+                    >
+
+                        <span id="signInText">
+                            Sign In
+                        </span>
+
+
+                        <svg
+                            id="signInArrow"
+                            width="20"
+                            height="20"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                        >
+                            <path d="M5 12h14" />
+                            <path d="m12 5 7 7-7 7" />
+                        </svg>
+
+
+                        <svg
+                            id="loadingSpinner"
+                            class="hidden"
+                            width="20"
+                            height="20"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                        >
+                            <circle
+                                cx="12"
+                                cy="12"
+                                r="9"
+                                opacity="0.25"
+                            />
+
+                            <path
+                                d="M21 12a9 9 0 0 1-9 9"
+                            />
+                        </svg>
+
+                    </button>
+
+
+
+                    <!-- DIVIDER -->
+
+                    <div class="divider">
+
+                        <div class="divider-line"></div>
+
+                        <span class="divider-text">
+                            OR CONTINUE WITH
+                        </span>
+
+                        <div class="divider-line"></div>
+
+                    </div>
+
+
+
+                    <!-- SOCIAL LOGIN -->
+
+                    <div class="social-row">
+
+                        <button
+                            type="button"
+                            class="social-button"
+                        >
+
+                            <span
+                                class="social-icon"
+                                style="color:#4285F4;"
+                            >
+                                G
+                            </span>
+
+                            Google
+
+                        </button>
+
+
+                        <button
+                            type="button"
+                            class="social-button"
+                        >
+
+                            <span
+                                class="social-icon"
+                                style="color:#111827;"
+                            >
+                                ●
+                            </span>
+
+                            Apple
+
+                        </button>
+
+                    </div>
+
+
+
+                    <!-- PASSKEY -->
+
+                    <button
+                        type="button"
+                        class="passkey-button"
+                    >
+
+                        <span>
+                            ◉
+                        </span>
+
+                        Sign in with Passkey / Biometrics
+
+                    </button>
+
+
+
+                    <!-- SECURITY -->
+
+                    <div class="security-note">
+
+                        <svg
+                            class="security-icon"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="1.8"
+                        >
+                            <path
+                                d="M12 3l7 3v5c0 4.5-2.8 8.3-7 10-4.2-1.7-7-5.5-7-10V6l7-3z"
+                            />
+
+                            <path
+                                d="m9 12 2 2 4-4"
+                            />
+                        </svg>
+
+                        <span>
+                            256-bit SSL encrypted
+                        </span>
+
+                        <span class="security-dot">
+                            •
+                        </span>
+
+                        <span>
+                            Instant ticket sync
+                        </span>
+
+                    </div>
+
+
+
+                    <!-- SIGN UP -->
+
+                    <div class="signup-box">
+
+                        <span>
+                            Don't have an account?
+                        </span>
+
+                        <a
+                            href="../12_Create Account/index.html"
+                            class="signup-link"
+                        >
+                            Sign Up ↗
+                        </a>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+
+    <!-- =====================================================
+         FOOTER
+    ====================================================== -->
+
+    <footer class="footer">
+
+        <div class="footer-left">
+
+            <span>
+                © 2025 Eventra Technologies Ltd. All rights reserved.
+            </span>
+
+
+            <div class="footer-links">
+
+                <a
+                    href="#"
+                    class="footer-link"
+                >
+                    Terms of Service
+                </a>
+
+                <span class="footer-dot">•</span>
+
+                <a
+                    href="#"
+                    class="footer-link"
+                >
+                    Privacy Policy
+                </a>
+
+                <span class="footer-dot">•</span>
+
+                <a
+                    href="#"
+                    class="footer-link"
+                >
+                    Security
+                </a>
+
+            </div>
+
+        </div>
+
+
+        <div class="location-pill">
+            ◉ Lagos, Nigeria
+        </div>
+
+    </footer>
+
+</div>
+
+
+<!-- =====================================================
+     JAVASCRIPT
+====================================================== -->
+
+<script src="./script.js"></script>
+
+</body>
+</html>

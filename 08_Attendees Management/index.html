@@ -1,0 +1,390 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#081B31">
+  <title>Attendees Management | Eventra Organizer</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ["Inter", "Arial", "Helvetica", "sans-serif"]
+          },
+          colors: {
+            eventra: "#6D28FF",
+            navy: "#081B31",
+            page: "#F5F7FC",
+            ink: "#10213A"
+          },
+          boxShadow: {
+            soft: "0 4px 18px rgba(16, 33, 58, 0.04)"
+          }
+        }
+      }
+    };
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    * { box-sizing: border-box; }
+
+    html { min-height: 100%; scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: #F5F7FC;
+      color: #10213A;
+      font-family: Inter, Arial, Helvetica, sans-serif;
+      font-style: normal;
+    }
+
+    button, input, select, textarea {
+      font: inherit;
+      font-style: normal;
+    }
+
+    button, a, select { -webkit-tap-highlight-color: transparent; }
+
+    button { cursor: pointer; }
+
+    .sidebar-scroll { scrollbar-width: thin; scrollbar-color: #33465c transparent; }
+
+    .nav-link {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-height: 48px;
+      padding: 12px 14px;
+      border-radius: 12px;
+      color: #D8E0ED;
+      font-size: 17px;
+      font-weight: 500;
+      text-decoration: none;
+      transition: background .18s ease, color .18s ease;
+    }
+
+    .nav-link:hover { background: rgba(255,255,255,.08); color: #fff; }
+
+    .nav-link.active {
+      background: #6D28FF;
+      color: #fff;
+      box-shadow: 0 8px 20px rgba(109,40,255,.18);
+    }
+
+    .nav-link svg { width: 19px; height: 19px; flex-shrink: 0; }
+
+    .secondary-text { font-size: 15px; line-height: 1.5; }
+
+    .table-head {
+      background: #F4F7FC;
+      color: #64708A;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: .035em;
+      text-transform: uppercase;
+    }
+
+    .attendee-row { border-bottom: 1px solid #F0F3F9; }
+    .attendee-row:last-child { border-bottom: 0; }
+
+    .attendee-row:hover { background: #FBFCFF; }
+
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      min-height: 25px;
+      border-radius: 999px;
+      padding: 4px 10px;
+      white-space: nowrap;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .status-valid { color: #5420D8; background: #EDE7FF; }
+    .status-checked { color: #25405F; background: #E7F0FF; }
+    .status-pending { color: #64708A; background: #F0F3FA; }
+    .status-used { color: #087F5B; background: #DDF8EE; }
+
+    .icon-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      background: #EAF0FF;
+      color: #243B5B;
+      transition: background .18s ease;
+    }
+
+    .icon-button:hover { background: #DDE7FF; }
+
+    .menu-panel {
+      position: absolute;
+      top: calc(100% + 8px);
+      right: 0;
+      z-index: 30;
+      width: 190px;
+      padding: 6px;
+      border: 1px solid #E5EAF3;
+      border-radius: 12px;
+      background: #fff;
+      box-shadow: 0 12px 32px rgba(16,33,58,.14);
+    }
+
+    .menu-panel button {
+      display: flex;
+      width: 100%;
+      align-items: center;
+      gap: 9px;
+      border-radius: 8px;
+      padding: 10px;
+      color: #34435C;
+      text-align: left;
+      font-size: 14px;
+    }
+
+    .menu-panel button:hover { background: #F4F6FC; }
+
+    .filter-button {
+      border: 1px solid transparent;
+      border-radius: 10px;
+      padding: 9px 13px;
+      color: #65708A;
+      white-space: nowrap;
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .filter-button.active {
+      border-color: #E2E9FF;
+      background: #fff;
+      color: #10213A;
+      box-shadow: 0 1px 4px rgba(16,33,58,.04);
+    }
+
+    .filter-count { margin-left: 4px; color: #6D28FF; font-weight: 700; }
+
+    .pagination-button {
+      display: inline-flex;
+      min-width: 36px;
+      height: 36px;
+      align-items: center;
+      justify-content: center;
+      border-radius: 11px;
+      background: #EEF2FC;
+      color: #243B5B;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .pagination-button:hover:not(:disabled) { background: #E2E8FB; }
+    .pagination-button.active { background: #5C0DE8; color: #fff; }
+    .pagination-button:disabled { cursor: not-allowed; opacity: .38; }
+
+    .toast {
+      position: fixed;
+      right: 20px;
+      bottom: 20px;
+      z-index: 100;
+      max-width: calc(100vw - 40px);
+      border-radius: 12px;
+      background: #10213A;
+      padding: 13px 17px;
+      color: white;
+      box-shadow: 0 12px 35px rgba(0,0,0,.2);
+      font-size: 14px;
+    }
+
+    .mobile-attendee-card { display: none; }
+
+    @media (max-width: 1023px) {
+      .desktop-sidebar { display: none; }
+      .desktop-main { margin-left: 0 !important; }
+      .mobile-header { display: flex !important; }
+      .desktop-topbar { display: none !important; }
+    }
+
+    @media (max-width: 767px) {
+      .page-content { padding: 18px 14px 30px !important; }
+      .page-title { font-size: 28px !important; line-height: 1.15; }
+      .header-event-name { display: none; }
+      .attendee-table-wrap { display: none; }
+      .mobile-attendee-card { display: block; }
+      .attendee-summary { width: 100%; }
+      .filter-tabs { width: 100%; overflow-x: auto; }
+      .filter-button { padding: 9px 11px; font-size: 13px; }
+      .mobile-header { padding: 12px 14px !important; }
+      .mobile-brand { font-size: 20px !important; }
+      .toast { right: 12px; bottom: 12px; }
+    }
+
+    @media (min-width: 768px) and (max-width: 1023px) {
+      .page-content { padding: 24px !important; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        scroll-behavior: auto !important;
+        transition-duration: .01ms !important;
+      }
+    }
+  </style>
+
+  <!-- Eventra shared organizer layout alignment -->
+  <link rel="stylesheet" href="../shared/eventra-shell.css">
+</head>
+
+<body class="bg-page text-ink" data-eventra-nav="attendees">
+<script src="../shared/eventra-shell.js"></script>
+  <!-- Mobile menu backdrop -->
+  
+  <!-- Mobile navigation -->
+  
+  <!-- Desktop sidebar -->
+  
+  <!-- Main content -->
+  <div class="desktop-main min-h-screen">
+    <!-- Mobile header -->
+    
+    <!-- Desktop top bar -->
+    
+    <!-- Page content -->
+    <main class="page-content px-7 py-7">
+      <section class="mb-6 flex flex-col justify-between gap-5 xl:flex-row xl:items-end">
+        <div class="min-w-0">
+          <div class="mb-2 flex flex-wrap items-center gap-2">
+            <span class="inline-flex items-center gap-2 rounded-full bg-[#EDE7FF] px-3 py-1 text-[12px] font-bold uppercase tracking-wide text-eventra">
+              <span class="h-2 w-2 rounded-full bg-eventra"></span> Active Event
+            </span>
+            <span id="eventContext" class="header-event-name text-[14px] text-slate-500">Loading event details…</span>
+          </div>
+          <h1 class="page-title text-[32px] font-bold leading-tight tracking-[-.035em] text-ink">
+            Attendees <span class="text-[20px] font-medium tracking-normal text-slate-500">/ <span id="eventTitle">All Events</span></span>
+          </h1>
+          <p class="secondary-text mt-1 text-slate-500">Manage attendee records, ticket status, and event check-ins.</p>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-3">
+          <div class="attendee-summary flex min-w-[220px] items-center gap-3 rounded-2xl border border-slate-100 bg-white px-4 py-3 shadow-soft">
+            <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-[#EEE9FF] text-eventra">
+              <i data-lucide="user-check" class="h-5 w-5"></i>
+            </span>
+            <div class="min-w-0">
+              <p class="text-[12px] font-bold uppercase tracking-wide text-slate-500">Total checked in</p>
+              <p class="text-[18px] font-bold text-ink"><span id="checkedInCount">0</span> <span class="text-[13px] font-medium text-slate-500">/ <span id="totalCountTop">0</span> (<span id="checkedInRate">0</span>%)</span></p>
+            </div>
+          </div>
+          <button id="exportCsvButton" type="button" class="inline-flex min-h-[44px] items-center justify-center gap-2 rounded-xl bg-[#5C0DE8] px-4 py-3 text-[14px] font-semibold text-white shadow-sm transition hover:bg-[#4D0BC4] focus:outline-none focus:ring-4 focus:ring-purple-200">
+            <i data-lucide="download" class="h-4 w-4"></i> Export CSV
+          </button>
+        </div>
+      </section>
+
+      <!-- Event selection and search/filter controls -->
+      <section class="rounded-2xl border border-slate-100 bg-white p-4 shadow-soft sm:p-5">
+        <div class="mb-5 flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
+          <div class="relative w-full xl:max-w-[490px]">
+            <i data-lucide="search" class="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-500"></i>
+            <input id="attendeeSearch" type="search" autocomplete="off"
+              placeholder="Search attendees by name, email, or order ID…"
+              class="h-[46px] w-full rounded-xl border border-transparent bg-[#EEF3FF] pl-12 pr-4 text-[15px] text-ink outline-none transition placeholder:text-slate-500 focus:border-purple-300 focus:bg-white focus:ring-4 focus:ring-purple-100">
+          </div>
+
+          <div class="flex flex-col gap-3 sm:flex-row sm:items-center">
+            <label for="eventSelect" class="sr-only">Select event</label>
+            <select id="eventSelect" class="h-[44px] min-w-0 rounded-xl border border-slate-200 bg-white px-3 text-[14px] text-ink outline-none focus:border-purple-400 focus:ring-4 focus:ring-purple-100 sm:max-w-[250px]">
+              <option value="">All available events</option>
+            </select>
+
+            <div class="filter-tabs flex items-center gap-1 rounded-xl bg-[#EAF0FF] p-1" role="group" aria-label="Filter attendees by check-in status">
+              <button class="filter-button active" type="button" data-filter="all" aria-pressed="true">All <span id="allCount" class="filter-count">0</span></button>
+              <button class="filter-button" type="button" data-filter="valid" aria-pressed="false">Valid <span id="validCount" class="ml-1">0</span></button>
+              <button class="filter-button" type="button" data-filter="checked" aria-pressed="false">Checked-in <span id="checkedCount" class="ml-1">0</span></button>
+              <button class="filter-button" type="button" data-filter="notchecked" aria-pressed="false">Not checked-in <span id="notCheckedCount" class="ml-1">0</span></button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Loading and error states -->
+        <div id="loadingState" class="hidden py-14 text-center">
+          <div class="mx-auto mb-3 h-8 w-8 animate-spin rounded-full border-4 border-purple-100 border-t-eventra"></div>
+          <p class="text-[15px] font-medium text-slate-600">Loading attendees…</p>
+        </div>
+
+        <div id="errorState" class="hidden rounded-xl border border-amber-200 bg-amber-50 p-4 text-[14px] text-amber-900">
+          <div class="flex items-start gap-3">
+            <i data-lucide="alert-circle" class="mt-0.5 h-5 w-5 flex-shrink-0"></i>
+            <div class="min-w-0 flex-1">
+              <p class="font-semibold">Attendee data could not be loaded.</p>
+              <p id="errorMessage" class="mt-1">Check your connection and try again.</p>
+              <button id="retryButton" type="button" class="mt-3 rounded-lg bg-amber-900 px-3 py-2 font-semibold text-white hover:bg-amber-800">Try again</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Desktop table -->
+        <div class="attendee-table-wrap overflow-x-auto">
+          <table class="w-full min-w-[930px] border-collapse text-left">
+            <thead class="table-head">
+              <tr>
+                <th class="px-4 py-3.5">Attendee</th>
+                <th class="px-4 py-3.5">Order ID</th>
+                <th class="px-4 py-3.5">Ticket Type</th>
+                <th class="px-4 py-3.5">Status</th>
+                <th class="px-4 py-3.5">Check-in Status</th>
+                <th class="px-4 py-3.5 text-center">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="attendeeTableBody">
+              <tr><td colspan="6" class="px-4 py-12 text-center text-[15px] text-slate-500">Loading attendee records…</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Mobile attendee cards -->
+        <div id="mobileAttendeeList" class="mobile-attendee-card space-y-3"></div>
+
+        <!-- Empty state -->
+        <div id="emptyState" class="hidden py-14 text-center">
+          <span class="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-[#F0EBFF] text-eventra">
+            <i data-lucide="users" class="h-7 w-7"></i>
+          </span>
+          <h2 class="text-[17px] font-semibold text-ink">No attendees found</h2>
+          <p id="emptyDescription" class="secondary-text mt-1 text-slate-500">Try changing your search or filter.</p>
+          <button id="clearFiltersButton" type="button" class="mt-4 rounded-xl bg-[#EEE7FF] px-4 py-2.5 text-[14px] font-semibold text-eventra hover:bg-[#E2D7FF]">Clear filters</button>
+        </div>
+
+        <!-- Footer and pagination -->
+        <div id="tableFooter" class="mt-5 flex flex-col gap-4 border-t border-slate-100 pt-4 sm:flex-row sm:items-center sm:justify-between">
+          <p id="showingText" class="secondary-text text-slate-500">Showing 0 attendees</p>
+          <div id="pagination" class="flex flex-wrap items-center gap-1.5" aria-label="Attendee pages"></div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Action menu portal -->
+  <div id="actionMenu" class="menu-panel hidden" role="menu"></div>
+
+  <!-- Toast -->
+  <div id="toast" class="toast hidden" role="status" aria-live="polite"></div>
+
+  <script src="./script.js"></script>
+  <script>
+    if (window.lucide) window.lucide.createIcons();
+  </script>
+</body>
+</html>

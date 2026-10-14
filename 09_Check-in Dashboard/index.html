@@ -1,0 +1,1356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#081b31">
+  <title>Check-in Dashboard | Eventra Organizer</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ["Inter", "Arial", "Helvetica", "sans-serif"]
+          },
+          colors: {
+            eventra: "#6D28FF",
+            navy: "#081B31",
+            canvas: "#F5F7FC"
+          }
+        }
+      }
+    };
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      min-height: 100%;
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: #F5F7FC;
+      color: #10223B;
+      font-family: Inter, Arial, Helvetica, sans-serif;
+      font-style: normal !important;
+    }
+
+    button,
+    input,
+    select,
+    textarea {
+      font: inherit;
+      font-style: normal !important;
+    }
+
+    button,
+    select {
+      cursor: pointer;
+    }
+
+    button:focus-visible,
+    a:focus-visible,
+    input:focus-visible,
+    select:focus-visible {
+      outline: 3px solid rgba(109,40,255,.35);
+      outline-offset: 2px;
+    }
+
+    /* Consistent sidebar navigation styling */
+    .sidebar-link {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-height: 46px;
+      padding: 11px 13px;
+      border-radius: 12px;
+      color: #dbe5f3;
+      font-family: "Inter", Arial, Helvetica, sans-serif;
+      font-size: 14px;
+      font-weight: 500;
+      line-height: 1.4;
+      text-decoration: none;
+      transition: background 0.2s ease, color 0.2s ease;
+    }
+
+    .sidebar-link:hover:not(.active) {
+      background: rgba(255,255,255,.06);
+      color: #ffffff;
+    }
+
+    .sidebar-link.active {
+      background: #6D28FF;
+      color: #ffffff;
+      box-shadow: 0 6px 16px rgba(109,40,255,.22);
+    }
+
+    .sidebar-link .nav-icon {
+      display: inline-flex;
+      width: 22px;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      line-height: 1;
+      flex-shrink: 0;
+    }
+
+    .panel {
+      min-width: 0;
+      background: #fff;
+      border: 1px solid #edf0f7;
+      border-radius: 15px;
+      box-shadow: 0 2px 5px rgba(16,34,59,.015);
+    }
+
+    .secondary-text {
+      font-size: 15px;
+      line-height: 1.5;
+      color: #64748b;
+    }
+
+    .small-label {
+      font-size: 12px;
+      line-height: 1.4;
+      font-weight: 700;
+      letter-spacing: .025em;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 999px;
+      padding: 4px 9px;
+      font-size: 11px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .scanner-screen {
+      position: relative;
+      min-height: 190px;
+      overflow: hidden;
+      border-radius: 12px;
+      background: #081b31;
+      color: #eaf0ff;
+    }
+
+    .scanner-frame {
+      position: absolute;
+      width: 138px;
+      height: 112px;
+      left: 50%;
+      top: 48%;
+      transform: translate(-50%, -50%);
+      border: 0;
+    }
+
+    .scanner-frame::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(#6D28FF,#6D28FF) left top/24px 3px no-repeat,
+        linear-gradient(#6D28FF,#6D28FF) left top/3px 24px no-repeat,
+        linear-gradient(#6D28FF,#6D28FF) right top/24px 3px no-repeat,
+        linear-gradient(#6D28FF,#6D28FF) right top/3px 24px no-repeat,
+        linear-gradient(#6D28FF,#6D28FF) left bottom/24px 3px no-repeat,
+        linear-gradient(#6D28FF,#6D28FF) left bottom/3px 24px no-repeat,
+        linear-gradient(#6D28FF,#6D28FF) right bottom/24px 3px no-repeat,
+        linear-gradient(#6D28FF,#6D28FF) right bottom/3px 24px no-repeat;
+    }
+
+    .scan-line {
+      position: absolute;
+      left: 8%;
+      right: 8%;
+      top: 50%;
+      height: 2px;
+      background: #6D28FF;
+      box-shadow: 0 0 14px rgba(109,40,255,.9);
+      animation: scanline 2.5s ease-in-out infinite alternate;
+    }
+
+    @keyframes scanline {
+      from {
+        transform: translateY(-38px);
+      }
+      to {
+        transform: translateY(38px);
+      }
+    }
+
+    .bar {
+      min-width: 10px;
+      flex: 1;
+      max-width: 28px;
+      border-radius: 5px 5px 0 0;
+      background: linear-gradient(180deg,#6D28FF,#b9a1ff);
+      transition: height .2s ease;
+    }
+
+    .bar.current {
+      background: linear-gradient(180deg,#f6b94a,#c9871c);
+    }
+
+    .table-wrap {
+      width: 100%;
+      overflow-x: auto;
+    }
+
+    .data-table {
+      width: 100%;
+      min-width: 780px;
+      border-collapse: collapse;
+    }
+
+    .data-table th {
+      background: #eef3ff;
+      color: #475569;
+      text-align: left;
+      padding: 13px 14px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .025em;
+      text-transform: uppercase;
+    }
+
+    .data-table td {
+      padding: 13px 14px;
+      border-bottom: 1px solid #eef2f8;
+      font-size: 13px;
+      line-height: 1.45;
+      vertical-align: middle;
+    }
+
+    .data-table tbody tr:hover {
+      background: #fafbff;
+    }
+
+    .mobile-overlay {
+      display: none;
+    }
+
+    @media (max-width: 1023px) {
+      #desktopSidebar {
+        display: none;
+      }
+
+      #mainContent {
+        margin-left: 0 !important;
+      }
+
+      #mobileMenuButton {
+        display: inline-flex;
+      }
+
+      .mobile-overlay.open {
+        display: block;
+        position: fixed;
+        inset: 0;
+        z-index: 60;
+        background: rgba(3,12,25,.58);
+      }
+
+      #mobileDrawer {
+        position: fixed;
+        z-index: 70;
+        inset: 0 auto 0 0;
+        width: min(300px, 86vw);
+        overflow-y: auto;
+        transform: translateX(-105%);
+        transition: transform .25s ease;
+      }
+
+      #mobileDrawer.open {
+        transform: translateX(0);
+      }
+    }
+
+    @media (min-width: 1024px) {
+      #mobileMenuButton {
+        display: none !important;
+      }
+
+      #mobileDrawer,
+      #mobileOverlay {
+        display: none !important;
+      }
+    }
+
+    @media (max-width: 767px) {
+      .page-heading {
+        font-size: 28px !important;
+        line-height: 1.15 !important;
+      }
+
+      .stat-grid {
+        grid-template-columns: repeat(2,minmax(0,1fr));
+      }
+
+      .dashboard-grid {
+        grid-template-columns: minmax(0,1fr) !important;
+      }
+
+      .scanner-screen {
+        min-height: 180px;
+      }
+
+      .table-heading-row {
+        align-items: flex-start !important;
+        flex-direction: column;
+      }
+
+      .table-filters {
+        width: 100%;
+        display: grid;
+        grid-template-columns: 1fr;
+      }
+
+      .table-filters > * {
+        width: 100%;
+        min-width: 0;
+      }
+    }
+
+    @media (max-width: 420px) {
+      .stat-grid {
+        grid-template-columns: minmax(0,1fr);
+      }
+
+      .header-date {
+        display: none;
+      }
+
+      .panel {
+        border-radius: 12px;
+      }
+
+      .mobile-content-pad {
+        padding-left: 14px !important;
+        padding-right: 14px !important;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        animation-duration: .01ms !important;
+        transition-duration: .01ms !important;
+        scroll-behavior: auto !important;
+      }
+    }
+  </style>
+
+  <!-- Eventra shared organizer layout alignment -->
+  <link rel="stylesheet" href="../shared/eventra-shell.css">
+</head>
+
+<body data-eventra-nav="checkin">
+<script src="../shared/eventra-shell.js"></script>
+
+  <!-- Desktop sidebar -->
+  
+  <!-- Mobile drawer -->
+  
+      <!-- Main dashboard content -->
+  <main id="mainContent" class="min-h-screen">
+
+    <!-- Top header -->
+    <div class="mx-auto max-w-[1600px] px-4 pt-6 sm:px-6 lg:px-8 lg:pt-8">
+      <div class="flex items-end justify-between gap-4">
+        <div class="min-w-0">
+          <p class="mb-1 text-xs font-medium text-slate-400">Organizer Workspace / Check-in</p>
+          <h1 class="page-heading text-2xl font-bold tracking-tight text-slate-900 sm:text-[30px]">Check-in Dashboard</h1>
+        </div>
+        <div class="header-date hidden text-right sm:block">
+          <p id="currentDate" class="text-sm font-semibold text-slate-700"></p>
+          <p id="currentTime" class="mt-1 text-xs text-slate-400"></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Page body -->
+    <div class="mobile-content-pad mx-auto max-w-[1600px] space-y-6 px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
+
+      <!-- Welcome and event selector -->
+      <section class="flex flex-col justify-between gap-5 xl:flex-row xl:items-end">
+        <div>
+          <p class="mb-2 text-sm font-semibold text-violet-600">
+            EVENT OPERATIONS
+          </p>
+
+          <h2 class="text-xl font-bold tracking-tight text-slate-900 sm:text-2xl">
+            Manage event check-ins
+          </h2>
+
+          <p class="secondary-text mt-2 max-w-2xl">
+            Monitor attendance, verify tickets, and keep your entry process running smoothly.
+          </p>
+        </div>
+
+        <div class="flex flex-col gap-3 sm:flex-row sm:items-end">
+          <div class="min-w-0 sm:min-w-[230px]">
+            <label
+              for="eventSelector"
+              class="mb-2 block text-xs font-semibold text-slate-600">
+              Select event
+            </label>
+
+            <select
+              id="eventSelector"
+              class="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 outline-none transition focus:border-violet-400">
+              <option value="">All events</option>
+            </select>
+          </div>
+
+          <button
+            id="refreshDashboard"
+            type="button"
+            class="inline-flex min-h-[44px] items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50">
+            <span aria-hidden="true">↻</span>
+            Refresh
+          </button>
+        </div>
+      </section>
+
+      <!-- Dashboard statistics -->
+      <section
+        class="stat-grid grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4"
+        aria-label="Check-in statistics">
+
+        <!-- Total registered -->
+        <article class="panel p-5 sm:p-6">
+          <div class="flex items-start justify-between gap-3">
+            <div>
+              <p class="text-sm font-medium text-slate-500">
+                Total Registered
+              </p>
+
+              <p
+                id="totalRegistered"
+                class="mt-3 text-3xl font-bold tracking-tight text-slate-900">
+                0
+              </p>
+            </div>
+
+            <div class="flex h-11 w-11 items-center justify-center rounded-xl bg-violet-50 text-xl text-violet-600">
+              ♧
+            </div>
+          </div>
+
+          <div class="mt-5 flex items-center justify-between gap-2">
+            <span class="text-xs text-slate-500">
+              Registered attendees
+            </span>
+
+            <span class="pill bg-violet-50 text-violet-700">
+              Registered
+            </span>
+          </div>
+        </article>
+
+        <!-- Checked in -->
+        <article class="panel p-5 sm:p-6">
+          <div class="flex items-start justify-between gap-3">
+            <div>
+              <p class="text-sm font-medium text-slate-500">
+                Checked In
+              </p>
+
+              <p
+                id="totalCheckedIn"
+                class="mt-3 text-3xl font-bold tracking-tight text-slate-900">
+                0
+              </p>
+            </div>
+
+            <div class="flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-50 text-xl text-emerald-600">
+              ✓
+            </div>
+          </div>
+
+          <div class="mt-5 flex items-center justify-between gap-2">
+            <span class="text-xs text-slate-500">
+              Successfully admitted
+            </span>
+
+            <span class="pill bg-emerald-50 text-emerald-700">
+              Checked in
+            </span>
+          </div>
+        </article>
+
+        <!-- Remaining -->
+        <article class="panel p-5 sm:p-6">
+          <div class="flex items-start justify-between gap-3">
+            <div>
+              <p class="text-sm font-medium text-slate-500">
+                Not Yet Checked In
+              </p>
+
+              <p
+                id="totalPending"
+                class="mt-3 text-3xl font-bold tracking-tight text-slate-900">
+                0
+              </p>
+            </div>
+
+            <div class="flex h-11 w-11 items-center justify-center rounded-xl bg-amber-50 text-xl text-amber-600">
+              ◷
+            </div>
+          </div>
+
+          <div class="mt-5 flex items-center justify-between gap-2">
+            <span class="text-xs text-slate-500">
+              Awaiting arrival
+            </span>
+
+            <span class="pill bg-amber-50 text-amber-700">
+              Pending
+            </span>
+          </div>
+        </article>
+
+        <!-- Attendance rate -->
+        <article class="panel p-5 sm:p-6">
+          <div class="flex items-start justify-between gap-3">
+            <div>
+              <p class="text-sm font-medium text-slate-500">
+                Check-in Rate
+              </p>
+
+              <p
+                id="checkInRate"
+                class="mt-3 text-3xl font-bold tracking-tight text-slate-900">
+                0%
+              </p>
+            </div>
+
+            <div class="flex h-11 w-11 items-center justify-center rounded-xl bg-sky-50 text-xl text-sky-600">
+              %
+            </div>
+          </div>
+
+          <div class="mt-5 h-2 overflow-hidden rounded-full bg-slate-100">
+            <div
+              id="checkInRateBar"
+              class="h-full rounded-full bg-violet-600 transition-all duration-300"
+              style="width: 0%">
+            </div>
+          </div>
+
+          <p class="mt-2 text-xs text-slate-500">
+            Percentage of registered attendees admitted
+          </p>
+        </article>
+      </section>
+
+      <!-- Scanner and live activity area -->
+      <section
+        class="dashboard-grid grid grid-cols-1 gap-5 xl:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]">
+
+        <!-- Ticket scanner -->
+        <article class="panel overflow-hidden">
+          <div class="flex items-start justify-between gap-4 border-b border-slate-100 px-5 py-5 sm:px-6">
+            <div>
+              <h3 class="text-base font-bold text-slate-900 sm:text-lg">
+                Ticket Scanner
+              </h3>
+
+              <p class="mt-1 text-sm text-slate-500">
+                Scan an attendee's ticket or enter the ticket code manually.
+              </p>
+            </div>
+
+            <span class="pill bg-emerald-50 text-emerald-700">
+              Check-in
+            </span>
+          </div>
+
+          <div class="space-y-5 p-5 sm:p-6">
+
+            <!-- Scanner display -->
+            <div class="scanner-screen flex flex-col items-center justify-center p-5 text-center">
+              <div class="scanner-frame" aria-hidden="true">
+                <div class="scan-line"></div>
+              </div>
+
+              <div class="relative z-10 mt-[125px]">
+                <p class="text-sm font-semibold text-white">
+                  Ready to scan
+                </p>
+
+                <p class="mt-1 text-xs text-slate-300">
+                  Position the ticket QR code inside the frame.
+                </p>
+              </div>
+            </div>
+
+            <!-- Scanner status -->
+            <div
+              id="scannerStatus"
+              class="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600"
+              role="status"
+              aria-live="polite">
+              Scanner ready. Enter a ticket code below to verify an attendee.
+            </div>
+
+            <!-- Manual ticket lookup -->
+            <form id="manualCheckInForm" class="space-y-3">
+              <label
+                for="ticketCodeInput"
+                class="block text-sm font-semibold text-slate-700">
+                Enter ticket code
+              </label>
+
+              <div class="flex flex-col gap-3 sm:flex-row">
+                <input
+                  id="ticketCodeInput"
+                  name="ticketCode"
+                  type="text"
+                  autocomplete="off"
+                  placeholder="e.g. EVT-123456"
+                  class="min-h-[46px] min-w-0 flex-1 rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none transition placeholder:text-slate-400 focus:border-violet-400"
+                  required>
+
+                <button
+                  id="verifyTicketButton"
+                  type="submit"
+                  class="min-h-[46px] rounded-xl bg-violet-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-violet-700">
+                  Verify Ticket
+                </button>
+              </div>
+            </form>
+
+            <!-- Check-in action -->
+            <button
+              id="checkInButton"
+              type="button"
+              class="flex min-h-[46px] w-full items-center justify-center gap-2 rounded-xl bg-slate-900 px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-50"
+              disabled>
+              <span aria-hidden="true">✓</span>
+              Confirm Check-in
+            </button>
+
+            <p class="text-xs leading-5 text-slate-500">
+              Verify the ticket details before confirming admission. A ticket should not be checked in more than once.
+            </p>
+          </div>
+        </article>
+
+        <!-- Live check-in summary -->
+        <article class="panel overflow-hidden">
+          <div class="flex items-start justify-between gap-4 border-b border-slate-100 px-5 py-5 sm:px-6">
+            <div>
+              <h3 class="text-base font-bold text-slate-900 sm:text-lg">
+                Live Check-in Activity
+              </h3>
+
+              <p class="mt-1 text-sm text-slate-500">
+                An overview of today's attendance progress.
+              </p>
+            </div>
+
+            <span class="flex items-center gap-2 text-xs font-semibold text-emerald-700">
+              <span class="h-2 w-2 rounded-full bg-emerald-500"></span>
+              Live
+            </span>
+          </div>
+
+          <div class="space-y-6 p-5 sm:p-6">
+
+            <!-- Progress -->
+            <div>
+              <div class="mb-3 flex items-center justify-between gap-3">
+                <span class="text-sm font-semibold text-slate-700">
+                  Attendance progress
+                </span>
+
+                <span
+                  id="attendanceProgressLabel"
+                  class="text-sm font-bold text-violet-700">
+                  0%
+                </span>
+              </div>
+
+              <div class="h-3 overflow-hidden rounded-full bg-slate-100">
+                <div
+                  id="attendanceProgressBar"
+                  class="h-full rounded-full bg-violet-600 transition-all duration-300"
+                  style="width: 0%">
+                </div>
+              </div>
+
+              <div class="mt-3 flex items-center justify-between gap-3 text-xs text-slate-500">
+                <span>
+                  <span id="progressCheckedIn">0</span> checked in
+                </span>
+
+                <span>
+                  <span id="progressRemaining">0</span> remaining
+                </span>
+              </div>
+            </div>
+
+            <!-- Activity summary -->
+            <div class="grid grid-cols-2 gap-3">
+              <div class="rounded-xl bg-slate-50 p-4">
+                <p class="text-xs font-medium text-slate-500">
+                  Total admissions
+                </p>
+
+                <p
+                  id="activityTotal"
+                  class="mt-2 text-2xl font-bold text-slate-900">
+                  0
+                </p>
+              </div>
+
+              <div class="rounded-xl bg-slate-50 p-4">
+                <p class="text-xs font-medium text-slate-500">
+                  Latest check-in
+                </p>
+
+                <p
+                  id="latestCheckInTime"
+                  class="mt-2 text-lg font-bold text-slate-900">
+                  --
+                </p>
+              </div>
+            </div>
+
+            <!-- Recent activity list -->
+            <div>
+              <div class="mb-4 flex items-center justify-between gap-3">
+                <h4 class="text-sm font-bold text-slate-900">
+                  Recent admissions
+                </h4>
+
+                <button
+                  id="viewAllActivityButton"
+                  type="button"
+                  class="text-xs font-semibold text-violet-600 hover:text-violet-800">
+                  View all
+                </button>
+              </div>
+
+              <div id="recentActivityList" class="space-y-3">
+                <div class="rounded-xl border border-dashed border-slate-200 px-4 py-6 text-center">
+                  <p class="text-sm font-medium text-slate-600">
+                    No recent check-ins
+                  </p>
+
+                  <p class="mt-1 text-xs text-slate-400">
+                    Successful admissions will appear here.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </article>
+      </section>
+            <!-- Attendee records -->
+      <section id="attendeeRecordsSection" class="panel overflow-hidden">
+
+        <!-- Table header -->
+        <div class="table-heading-row flex flex-col justify-between gap-4 border-b border-slate-100 px-5 py-5 sm:px-6 lg:flex-row lg:items-center">
+          <div>
+            <h3 class="text-base font-bold text-slate-900 sm:text-lg">
+              Attendee Records
+            </h3>
+
+            <p class="mt-1 text-sm text-slate-500">
+              Search attendees, verify registration details, and review admission status.
+            </p>
+          </div>
+
+          <div class="flex flex-wrap items-center gap-3">
+            <button
+              id="exportAttendeesButton"
+              type="button"
+              class="inline-flex min-h-[42px] items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50">
+              <span aria-hidden="true">↓</span>
+              Export CSV
+            </button>
+
+            <button
+              id="refreshAttendeesButton"
+              type="button"
+              class="inline-flex min-h-[42px] items-center justify-center gap-2 rounded-xl bg-violet-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-violet-700">
+              <span aria-hidden="true">↻</span>
+              Refresh List
+            </button>
+          </div>
+        </div>
+
+        <!-- Search and filters -->
+        <div class="space-y-4 border-b border-slate-100 bg-slate-50/60 px-5 py-5 sm:px-6">
+
+          <div class="table-filters grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-[minmax(0,1.6fr)_minmax(150px,1fr)_minmax(150px,1fr)_auto]">
+
+            <!-- Search -->
+            <div>
+              <label
+                for="attendeeSearch"
+                class="mb-2 block text-xs font-semibold text-slate-600">
+                Search attendees
+              </label>
+
+              <div class="relative">
+                <span
+                  class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+                  aria-hidden="true">
+                  ⌕
+                </span>
+
+                <input
+                  id="attendeeSearch"
+                  name="attendeeSearch"
+                  type="search"
+                  autocomplete="off"
+                  placeholder="Search name, email or ticket ID..."
+                  class="min-h-[44px] w-full rounded-xl border border-slate-200 bg-white py-3 pl-9 pr-3 text-sm outline-none transition focus:border-violet-400">
+              </div>
+            </div>
+
+            <!-- Check-in status filter -->
+            <div>
+              <label
+                for="checkInStatusFilter"
+                class="mb-2 block text-xs font-semibold text-slate-600">
+                Check-in status
+              </label>
+
+              <select
+                id="checkInStatusFilter"
+                class="min-h-[44px] w-full rounded-xl border border-slate-200 bg-white px-3 py-3 text-sm text-slate-700 outline-none transition focus:border-violet-400">
+                <option value="all">All statuses</option>
+                <option value="checked-in">Checked in</option>
+                <option value="pending">Not checked in</option>
+              </select>
+            </div>
+
+            <!-- Ticket type filter -->
+            <div>
+              <label
+                for="ticketTypeFilter"
+                class="mb-2 block text-xs font-semibold text-slate-600">
+                Ticket type
+              </label>
+
+              <select
+                id="ticketTypeFilter"
+                class="min-h-[44px] w-full rounded-xl border border-slate-200 bg-white px-3 py-3 text-sm text-slate-700 outline-none transition focus:border-violet-400">
+                <option value="all">All ticket types</option>
+                <option value="regular">Regular</option>
+                <option value="vip">VIP</option>
+                <option value="early-bird">Early Bird</option>
+              </select>
+            </div>
+
+            <!-- Reset filters -->
+            <div class="flex items-end">
+              <button
+                id="resetAttendeeFilters"
+                type="button"
+                class="min-h-[44px] w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-600 transition hover:bg-slate-100 xl:w-auto">
+                Reset filters
+              </button>
+            </div>
+          </div>
+
+          <!-- Table result summary -->
+          <div class="flex flex-wrap items-center justify-between gap-3">
+            <p class="text-sm text-slate-500">
+              Showing
+              <span id="visibleAttendeeCount" class="font-semibold text-slate-800">0</span>
+              of
+              <span id="allAttendeeCount" class="font-semibold text-slate-800">0</span>
+              attendees
+            </p>
+
+            <div class="flex items-center gap-2">
+              <span class="h-2 w-2 rounded-full bg-emerald-500"></span>
+              <span class="text-xs text-slate-500">
+                Checked-in status updates when records are refreshed
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Attendee table -->
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th scope="col">
+                  Attendee
+                </th>
+
+                <th scope="col">
+                  Ticket ID
+                </th>
+
+                <th scope="col">
+                  Ticket Type
+                </th>
+
+                <th scope="col">
+                  Registration Date
+                </th>
+
+                <th scope="col">
+                  Check-in Status
+                </th>
+
+                <th scope="col">
+                  Check-in Time
+                </th>
+
+                <th scope="col">
+                  Action
+                </th>
+              </tr>
+            </thead>
+
+            <tbody id="attendeeTableBody">
+              <tr>
+                <td colspan="7" class="!py-12 text-center">
+                  <div class="mx-auto flex max-w-sm flex-col items-center">
+                    <span class="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-slate-100 text-xl text-slate-400">
+                      ♧
+                    </span>
+
+                    <p class="text-sm font-semibold text-slate-700">
+                      Loading attendee records
+                    </p>
+
+                    <p class="mt-1 text-xs text-slate-400">
+                      Please wait while attendee data is retrieved.
+                    </p>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Empty and error messages -->
+        <div
+          id="attendeeTableMessage"
+          class="hidden border-t border-slate-100 px-5 py-6 text-center sm:px-6"
+          role="status"
+          aria-live="polite">
+          <p class="text-sm font-medium text-slate-600">
+            No attendee records to display.
+          </p>
+
+          <p class="mt-1 text-xs text-slate-400">
+            Try adjusting your search or filter settings.
+          </p>
+        </div>
+
+        <!-- Pagination -->
+        <div class="flex flex-col justify-between gap-4 border-t border-slate-100 px-5 py-4 sm:flex-row sm:items-center sm:px-6">
+
+          <p class="text-xs text-slate-500">
+            Attendee records are subject to the selected event and available registration data.
+          </p>
+
+          <div class="flex items-center justify-between gap-2 sm:justify-end">
+            <button
+              id="previousPageButton"
+              type="button"
+              class="min-h-[38px] rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-600 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
+              disabled>
+              ← Previous
+            </button>
+
+            <span
+              id="paginationLabel"
+              class="min-w-[70px] text-center text-xs font-medium text-slate-500">
+              Page 1
+            </span>
+
+            <button
+              id="nextPageButton"
+              type="button"
+              class="min-h-[38px] rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-600 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
+              disabled>
+              Next →
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Additional check-in information -->
+      <section class="grid grid-cols-1 gap-5 lg:grid-cols-2">
+
+        <!-- Check-in guidance -->
+        <article class="panel p-5 sm:p-6">
+          <div class="flex items-start gap-4">
+            <div class="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl bg-violet-50 text-xl text-violet-600">
+              ⓘ
+            </div>
+
+            <div class="min-w-0">
+              <h3 class="text-base font-bold text-slate-900">
+                Check-in guidelines
+              </h3>
+
+              <p class="mt-2 text-sm leading-6 text-slate-500">
+                Verify each attendee's ticket before granting entry. Confirm that the registration belongs to the selected event and that the ticket has not already been used.
+              </p>
+
+              <ul class="mt-4 space-y-3 text-sm text-slate-600">
+                <li class="flex items-start gap-2">
+                  <span class="mt-0.5 font-bold text-emerald-600">✓</span>
+                  <span>Confirm the attendee's ticket details.</span>
+                </li>
+
+                <li class="flex items-start gap-2">
+                  <span class="mt-0.5 font-bold text-emerald-600">✓</span>
+                  <span>Check the current admission status.</span>
+                </li>
+
+                <li class="flex items-start gap-2">
+                  <span class="mt-0.5 font-bold text-emerald-600">✓</span>
+                  <span>Confirm admission only after successful verification.</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </article>
+
+        <!-- Check-in status legend -->
+        <article class="panel p-5 sm:p-6">
+          <h3 class="text-base font-bold text-slate-900">
+            Admission status guide
+          </h3>
+
+          <p class="mt-2 text-sm leading-6 text-slate-500">
+            Use these labels to understand the status displayed beside each attendee.
+          </p>
+
+          <div class="mt-5 space-y-4">
+
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl bg-emerald-50 font-bold text-emerald-600">
+                ✓
+              </span>
+
+              <div class="min-w-0 flex-1">
+                <p class="text-sm font-semibold text-slate-800">
+                  Checked in
+                </p>
+
+                <p class="mt-1 text-xs text-slate-500">
+                  Admission has been recorded successfully.
+                </p>
+              </div>
+
+              <span class="pill bg-emerald-50 text-emerald-700">
+                Admitted
+              </span>
+            </div>
+
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl bg-amber-50 font-bold text-amber-600">
+                ◷
+              </span>
+
+              <div class="min-w-0 flex-1">
+                <p class="text-sm font-semibold text-slate-800">
+                  Pending
+                </p>
+
+                <p class="mt-1 text-xs text-slate-500">
+                  The attendee has not yet been checked in.
+                </p>
+              </div>
+
+              <span class="pill bg-amber-50 text-amber-700">
+                Awaiting
+              </span>
+            </div>
+
+            <div class="flex items-center gap-3">
+              <span class="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl bg-red-50 font-bold text-red-600">
+                !
+              </span>
+
+              <div class="min-w-0 flex-1">
+                <p class="text-sm font-semibold text-slate-800">
+                  Invalid or unavailable
+                </p>
+
+                <p class="mt-1 text-xs text-slate-500">
+                  The ticket could not be verified for admission.
+                </p>
+              </div>
+
+              <span class="pill bg-red-50 text-red-700">
+                Review
+              </span>
+            </div>
+
+          </div>
+        </article>
+      </section>
+            <!-- Notification toast -->
+      <div
+        id="notificationToast"
+        class="fixed bottom-5 right-5 z-[100] hidden max-w-sm rounded-xl border border-slate-200 bg-white px-5 py-4 shadow-xl"
+        role="status"
+        aria-live="polite">
+
+        <div class="flex items-start gap-3">
+          <span id="toastIcon" class="text-lg font-bold text-emerald-600">
+            ✓
+          </span>
+
+          <div class="min-w-0 flex-1">
+            <p id="toastTitle" class="text-sm font-bold text-slate-900">
+              Notification
+            </p>
+
+            <p id="toastMessage" class="mt-1 text-sm leading-5 text-slate-500">
+              Your action has been processed.
+            </p>
+          </div>
+
+          <button
+            id="closeToastButton"
+            type="button"
+            class="text-lg leading-none text-slate-400 hover:text-slate-700"
+            aria-label="Close notification">
+            ×
+          </button>
+        </div>
+      </div>
+
+      <!-- Ticket verification dialog -->
+      <div
+        id="ticketVerificationModal"
+        class="fixed inset-0 z-[90] hidden items-center justify-center bg-slate-950/50 p-4"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="ticketModalTitle">
+
+        <div class="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl">
+
+          <div class="mb-5 flex items-start justify-between gap-4">
+            <div>
+              <h3 id="ticketModalTitle" class="text-lg font-bold text-slate-900">
+                Verify attendee
+              </h3>
+
+              <p class="mt-1 text-sm text-slate-500">
+                Review the ticket details before confirming admission.
+              </p>
+            </div>
+
+            <button
+              id="closeTicketModal"
+              type="button"
+              class="flex h-9 w-9 items-center justify-center rounded-lg text-xl text-slate-400 hover:bg-slate-100 hover:text-slate-700"
+              aria-label="Close verification dialog">
+              ×
+            </button>
+          </div>
+
+          <div
+            id="ticketVerificationDetails"
+            class="space-y-3 rounded-xl bg-slate-50 p-4">
+
+            <p class="text-sm text-slate-500">
+              No ticket has been selected.
+            </p>
+          </div>
+
+          <div class="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+            <button
+              id="cancelTicketVerification"
+              type="button"
+              class="min-h-[42px] rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-600 hover:bg-slate-50">
+              Cancel
+            </button>
+
+            <button
+              id="confirmTicketVerification"
+              type="button"
+              class="min-h-[42px] rounded-xl bg-violet-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-violet-700">
+              Confirm Check-in
+            </button>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- General confirmation dialog -->
+      <div
+        id="confirmationModal"
+        class="fixed inset-0 z-[95] hidden items-center justify-center bg-slate-950/50 p-4"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="confirmationModalTitle">
+
+        <div class="w-full max-w-sm rounded-2xl bg-white p-6 shadow-2xl">
+
+          <h3
+            id="confirmationModalTitle"
+            class="text-lg font-bold text-slate-900">
+            Confirm action
+          </h3>
+
+          <p
+            id="confirmationModalMessage"
+            class="mt-3 text-sm leading-6 text-slate-500">
+            Are you sure you want to continue?
+          </p>
+
+          <div class="mt-6 flex justify-end gap-3">
+            <button
+              id="cancelConfirmationButton"
+              type="button"
+              class="min-h-[42px] rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-600 hover:bg-slate-50">
+              Cancel
+            </button>
+
+            <button
+              id="acceptConfirmationButton"
+              type="button"
+              class="min-h-[42px] rounded-xl bg-violet-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-violet-700">
+              Confirm
+            </button>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Page footer -->
+      <footer class="flex flex-col justify-between gap-2 border-t border-slate-200 py-5 text-xs text-slate-400 sm:flex-row sm:items-center">
+        <p>
+          © <span id="footerYear">2026</span> Eventra. All rights reserved.
+        </p>
+
+        <p>
+          Organizer Workspace · Check-in Dashboard
+        </p>
+      </footer>
+
+    </div>
+  </main>
+
+  <!-- Mobile navigation interactions -->
+  <script>
+    (function () {
+      /* The mobile drawer lives in the shared shell. */
+
+      const dateElement = document.getElementById("currentDate");
+      const timeElement = document.getElementById("currentTime");
+      const yearElement = document.getElementById("footerYear");
+
+      function updateClock() {
+        const now = new Date();
+
+        if (dateElement) {
+          dateElement.textContent = now.toLocaleDateString(undefined, {
+            weekday: "short",
+            day: "numeric",
+            month: "short",
+            year: "numeric"
+          });
+        }
+
+        if (timeElement) {
+          timeElement.textContent = now.toLocaleTimeString(undefined, {
+            hour: "2-digit",
+            minute: "2-digit"
+          });
+        }
+
+        if (yearElement) {
+          yearElement.textContent = String(now.getFullYear());
+        }
+      }
+
+      updateClock();
+
+      const toast = document.getElementById("notificationToast");
+      const closeToast = document.getElementById("closeToastButton");
+
+      if (closeToast && toast) {
+        closeToast.addEventListener("click", function () {
+          toast.classList.add("hidden");
+        });
+      }
+
+      const ticketModal = document.getElementById("ticketVerificationModal");
+      const closeTicketModal = document.getElementById("closeTicketModal");
+      const cancelTicketVerification = document.getElementById("cancelTicketVerification");
+
+      function hideTicketModal() {
+        if (!ticketModal) return;
+
+        ticketModal.classList.add("hidden");
+        ticketModal.classList.remove("flex");
+      }
+
+      if (closeTicketModal) {
+        closeTicketModal.addEventListener("click", hideTicketModal);
+      }
+
+      if (cancelTicketVerification) {
+        cancelTicketVerification.addEventListener("click", hideTicketModal);
+      }
+
+      if (ticketModal) {
+        ticketModal.addEventListener("click", function (event) {
+          if (event.target === ticketModal) {
+            hideTicketModal();
+          }
+        });
+      }
+
+      const confirmationModal = document.getElementById("confirmationModal");
+      const cancelConfirmationButton = document.getElementById("cancelConfirmationButton");
+
+      if (cancelConfirmationButton && confirmationModal) {
+        cancelConfirmationButton.addEventListener("click", function () {
+          confirmationModal.classList.add("hidden");
+          confirmationModal.classList.remove("flex");
+        });
+      }
+
+      if (confirmationModal) {
+        confirmationModal.addEventListener("click", function (event) {
+          if (event.target === confirmationModal) {
+            confirmationModal.classList.add("hidden");
+            confirmationModal.classList.remove("flex");
+          }
+        });
+      }
+    })();
+  </script>
+
+  <!-- Existing Check-in Dashboard JavaScript -->
+  <script src="./script.js"></script>
+
+</body>
+</html>

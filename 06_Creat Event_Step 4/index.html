@@ -1,0 +1,613 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0A1D33">
+  <title>Eventra | Review & Publish Event</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            eventra: "#6D28FF",
+            navy: "#0A1D33",
+            canvas: "#F5F7FC",
+            muted: "#63718A",
+            pale: "#EEF3FF"
+          },
+          fontFamily: {
+            sans: ["Inter", "Arial", "Helvetica", "sans-serif"]
+          }
+        }
+      }
+    };
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: Inter, Arial, Helvetica, sans-serif;
+      font-size: 15px;
+      color: #14263D;
+      background: #F5F7FC;
+      font-style: normal;
+    }
+    button, input, select, textarea { font: inherit; }
+    button { cursor: pointer; }
+    .sidebar {
+      width: 190px;
+      min-height: 100vh;
+      position: fixed;
+      inset: 0 auto 0 0;
+      z-index: 40;
+      background: #0A1D33;
+      color: white;
+      display: flex;
+      flex-direction: column;
+    }
+    .main-shell { margin-left: 190px; min-height: 100vh; }
+    .nav-link {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      min-height: 43px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      color: #D5DEEC;
+      font-size: 15px;
+      font-weight: 500;
+      text-decoration: none;
+      transition: background .2s, color .2s;
+    }
+    .nav-link:hover { background: rgba(255,255,255,.08); color: #fff; }
+    .nav-link.active {
+      background: #6D28FF;
+      color: #fff;
+      box-shadow: 0 7px 18px rgba(109,40,255,.2);
+    }
+    .card {
+      background: #fff;
+      border: 1px solid #E9EDF5;
+      border-radius: 16px;
+      box-shadow: 0 2px 8px rgba(17,35,61,.025);
+    }
+    .muted { color: #63718A; }
+    .section-heading {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+    }
+    .section-icon {
+      width: 36px;
+      height: 36px;
+      flex: 0 0 36px;
+      display: grid;
+      place-items: center;
+      border-radius: 10px;
+      background: #EEE8FF;
+      color: #6D28FF;
+      font-size: 18px;
+      font-weight: 700;
+    }
+    .step-track {
+      height: 3px;
+      position: absolute;
+      left: 8%;
+      right: 8%;
+      top: 16px;
+      background: #DDE6F8;
+      border-radius: 99px;
+    }
+    .step-track-progress {
+      height: 3px;
+      width: 75%;
+      background: #6D28FF;
+      border-radius: 99px;
+    }
+    .step-circle {
+      width: 34px;
+      height: 34px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: #E7EEFC;
+      color: #758198;
+      font-size: 14px;
+      font-weight: 700;
+      margin: 0 auto 8px;
+      position: relative;
+      z-index: 1;
+    }
+    .step-circle.done, .step-circle.current { background: #6D28FF; color: #fff; }
+    .step-circle.current { box-shadow: 0 0 0 4px #E9DFFF; }
+    .step-label { font-size: 13px; font-weight: 700; }
+    .step-note { font-size: 12px; color: #8B95A8; margin-top: 3px; }
+    .detail-row {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 12px 0;
+      border-bottom: 1px solid #EDF0F6;
+    }
+    .detail-row:last-child { border-bottom: 0; }
+    .ticket-row {
+      display: grid;
+      grid-template-columns: minmax(0,1fr) auto;
+      gap: 14px;
+      align-items: center;
+      padding: 15px;
+      border-radius: 12px;
+      background: #EEF3FF;
+    }
+    .action-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-height: 42px;
+      border-radius: 10px;
+      padding: 10px 15px;
+      font-weight: 600;
+      font-size: 14px;
+      transition: .2s ease;
+    }
+    .primary-btn { background: #6D28FF; color: white; }
+    .primary-btn:hover { background: #5720D6; }
+    .secondary-btn { background: #E8EFFF; color: #18304E; }
+    .secondary-btn:hover { background: #DCE7FF; }
+    .outline-btn { background: #fff; border: 1px solid #DCE4F0; color: #263952; }
+    .outline-btn:hover { background: #F8FAFF; }
+    .publish-footer {
+      position: sticky;
+      bottom: 0;
+      z-index: 25;
+      background: rgba(255,255,255,.96);
+      border-top: 1px solid #E5EAF3;
+      backdrop-filter: blur(12px);
+    }
+    .toast {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 100;
+      max-width: min(400px, calc(100vw - 32px));
+      padding: 14px 18px;
+      border-radius: 12px;
+      background: #10243C;
+      color: white;
+      box-shadow: 0 12px 32px rgba(0,0,0,.18);
+      font-size: 14px;
+    }
+    .toast[hidden] { display: none; }
+    .mode-option {
+      border: 1px solid #E5EAF3;
+      border-radius: 14px;
+      padding: 16px;
+      text-align: left;
+      min-height: 160px;
+      background: #fff;
+    }
+    .mode-option.selected {
+      border: 2px solid #6D28FF;
+      background: #F3EFFF;
+      padding: 15px;
+    }
+    .readiness-item {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+    .checkmark {
+      width: 19px;
+      height: 19px;
+      flex: 0 0 19px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: #EDE7FF;
+      color: #6D28FF;
+      font-weight: 800;
+      font-size: 12px;
+    }
+    .event-banner {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      object-fit: cover;
+      border-radius: 12px;
+      background: #E7ECF8;
+    }
+    @media (min-width: 1500px) {
+      .content-max { max-width: 1600px; margin-inline: auto; }
+    }
+    @media (max-width: 1023px) {
+      .sidebar { width: 76px; }
+      .sidebar .brand-text,
+      .sidebar .workspace-label,
+      .sidebar .nav-text,
+      .sidebar .account-copy { display: none; }
+      .sidebar .brand-link { justify-content: center; padding-inline: 0; }
+      .sidebar nav { padding-inline: 10px; }
+      .nav-link { justify-content: center; padding: 12px 8px; }
+      .sidebar .account-box { margin: 10px; justify-content: center; padding: 12px 4px; }
+      .main-shell { margin-left: 76px; }
+    }
+    @media (max-width: 767px) {
+      .sidebar {
+        width: min(290px, 84vw);
+        transform: translateX(-105%);
+        transition: transform .25s ease;
+        box-shadow: 12px 0 40px rgba(0,0,0,.2);
+      }
+      .sidebar.mobile-open { transform: translateX(0); }
+      .sidebar .brand-text,
+      .sidebar .workspace-label,
+      .sidebar .nav-text,
+      .sidebar .account-copy { display: block; }
+      .sidebar .brand-link { justify-content: flex-start; padding-inline: 18px; }
+      .sidebar nav { padding-inline: 12px; }
+      .nav-link { justify-content: flex-start; padding: 12px; font-size: 16px; }
+      .sidebar .account-box { margin: 12px; justify-content: flex-start; padding: 12px; }
+      .main-shell { margin-left: 0; }
+      .mobile-overlay {
+        position: fixed; inset: 0; z-index: 35;
+        background: rgba(8,20,36,.48);
+      }
+      .stepper-grid { gap: 4px; }
+      .step-label { font-size: 11px; }
+      .step-note { font-size: 10px; }
+      .step-circle { width: 30px; height: 30px; font-size: 13px; }
+      .step-track { top: 14px; left: 7%; right: 7%; }
+      .ticket-row { grid-template-columns: minmax(0,1fr); }
+      .publish-footer-inner { flex-direction: column; align-items: stretch; }
+      .publish-footer-actions { display: grid; grid-template-columns: 1fr 1fr; }
+      .publish-footer-actions .action-btn { width: 100%; }
+    }
+    @media (max-width: 420px) {
+      .step-label { font-size: 10px; }
+      .step-note { display: none; }
+      .publish-footer-actions { grid-template-columns: 1fr; }
+    }
+  </style>
+
+  <!-- Eventra shared organizer layout alignment -->
+  <link rel="stylesheet" href="../shared/eventra-shell.css">
+<style id="eventra-shell-overrides">
+.main-shell { margin-left: 0 !important; }
+</style>
+</head>
+
+<body class="font-sans antialiased" data-eventra-nav="events">
+<script src="../shared/eventra-shell.js"></script>
+  <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+
+  
+  <!-- SIDEBAR -->
+  
+  <!-- MAIN -->
+  <div class="main-shell">
+    <!-- HEADER -->
+    
+    <main class="content-max px-4 pb-5 pt-5 sm:px-6 lg:px-8 lg:pt-7">
+      <!-- PAGE TITLE -->
+      <section class="mb-5 flex flex-col justify-between gap-4 xl:flex-row xl:items-center">
+        <div class="min-w-0">
+          <div class="mb-2 flex flex-wrap items-center gap-2">
+            <span class="rounded-full bg-eventra px-3 py-1 text-[12px] font-bold uppercase text-white">Step 4 &amp; 5 of 5 • Ready to launch</span>
+            <span id="eventIdBadge" class="rounded-full bg-[#E7EDFA] px-3 py-1 font-mono text-[12px] font-semibold text-[#52627A]">Event ID • Draft</span>
+          </div>
+          <p id="draftSavedText" class="mb-2 text-[13px] muted">◷ Draft not yet saved</p>
+          <h1 class="text-[30px] font-extrabold leading-tight tracking-[-0.035em] text-[#0D2037] sm:text-[34px] lg:text-[36px]">
+            Create Event: <span id="pageEventName">Your Event</span>
+          </h1>
+          <p class="mt-2 max-w-3xl text-[15px] leading-relaxed muted">
+            Review your event details, preview the live attendee discovery card, and configure your publishing settings before going live to attendees worldwide.
+          </p>
+        </div>
+
+        <div class="flex flex-wrap gap-2">
+          <button id="previewBtn" class="action-btn secondary-btn">◉ <span>Preview Attendee View</span></button>
+          <button id="guidelinesBtn" class="action-btn secondary-btn">▤ <span>Organizer Guidelines</span></button>
+        </div>
+      </section>
+
+      <!-- STEPPER -->
+      <section class="card mb-5 px-3 py-5 sm:px-5">
+        <div class="relative grid grid-cols-5 gap-1 stepper-grid">
+          <div class="step-track"><div class="step-track-progress"></div></div>
+          <button type="button" class="step relative z-10 text-center" data-goto-step="1">
+            <span class="step-circle done">✓</span>
+            <span class="step-label block">STEP 1<br class="sm:hidden"> Basic Info</span>
+          </button>
+          <button type="button" class="step relative z-10 text-center" data-goto-step="2">
+            <span class="step-circle done">✓</span>
+            <span class="step-label block">STEP 2<br class="sm:hidden"> Date &amp; Location</span>
+          </button>
+          <button type="button" class="step relative z-10 text-center" data-goto-step="3">
+            <span class="step-circle done">✓</span>
+            <span class="step-label block">STEP 3<br class="sm:hidden"> Tickets &amp; Pricing</span>
+          </button>
+          <button type="button" class="step relative z-10 text-center" aria-current="step">
+            <span class="step-circle current">4</span>
+            <span class="step-label block text-eventra">IN PROGRESS<br>Review Details</span>
+          </button>
+          <button type="button" class="step relative z-10 text-center" data-goto-step="5">
+            <span class="step-circle">5</span>
+            <span class="step-label block">FINAL STEP<br>Publish &amp; Go Live</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- REVIEW GRID -->
+      <div class="grid grid-cols-1 items-start gap-5 xl:grid-cols-[minmax(0,1.65fr)_minmax(300px,.85fr)]">
+        <div class="min-w-0 space-y-5">
+          <!-- EVENT OVERVIEW -->
+          <section class="card p-4 sm:p-5">
+            <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
+              <div class="section-heading">
+                <div class="section-icon">ⓘ</div>
+                <div>
+                  <h2 class="text-[18px] font-bold">1. Event Overview &amp; Basic Details</h2>
+                  <p class="mt-1 text-[14px] muted">Core brand positioning, discoverability tags, and public description</p>
+                </div>
+              </div>
+              <button class="action-btn secondary-btn !min-h-[36px] !px-3 !py-2" data-edit-step="1">✎ Edit Info</button>
+            </div>
+
+            <div class="grid gap-4 rounded-xl bg-[#EEF3FF] p-3 sm:grid-cols-[minmax(150px,.8fr)_minmax(0,1.2fr)] sm:p-4">
+              <div class="min-w-0">
+                <img id="eventImage" class="event-banner" alt="Event banner preview" src="">
+                <span class="mt-2 inline-flex rounded-md bg-white px-2 py-1 text-[12px] font-semibold text-[#53627A]">16:9 Banner Preview</span>
+              </div>
+              <div class="min-w-0">
+                <div class="mb-2 flex flex-wrap gap-2">
+                  <span id="eventCategory" class="rounded-full bg-[#E4D8FF] px-2.5 py-1 text-[12px] font-bold text-[#5D25E8]">Technology &amp; Startups</span>
+                  <span class="rounded-full bg-white px-2.5 py-1 text-[12px] font-semibold text-[#42516A]">Public Discoverable</span>
+                </div>
+                <span class="mb-2 inline-flex rounded-full bg-[#E5E0F5] px-2 py-1 text-[11px] font-bold text-[#5B35B2]">✓ Organizer review</span>
+                <h3 id="overviewEventName" class="text-[20px] font-bold leading-tight">Your Event Name</h3>
+                <p id="eventDescription" class="mt-2 text-[14px] leading-relaxed muted">Your event description will appear here.</p>
+                <div id="eventTags" class="mt-3 flex flex-wrap gap-2"></div>
+              </div>
+            </div>
+          </section>
+
+          <!-- DATE AND VENUE -->
+          <section class="card p-4 sm:p-5">
+            <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
+              <div class="section-heading">
+                <div class="section-icon bg-[#E5E9FF] text-[#4D56D8]">⌖</div>
+                <div>
+                  <h2 class="text-[18px] font-bold">2. Date, Time &amp; Venue</h2>
+                  <p class="mt-1 text-[14px] muted">Review the scheduled timing and event location</p>
+                </div>
+              </div>
+              <button class="action-btn secondary-btn !min-h-[36px] !px-3 !py-2" data-edit-step="2">✎ Edit Venue</button>
+            </div>
+            <div class="grid gap-3 sm:grid-cols-2">
+              <div class="rounded-xl bg-[#EEF3FF] p-4">
+                <div class="mb-3 flex items-center gap-3">
+                  <span class="grid h-9 w-9 place-items-center rounded-lg bg-white text-lg text-eventra">▣</span>
+                  <div>
+                    <p class="text-[12px] font-bold uppercase tracking-wide text-[#69758B]">Scheduled Timing</p>
+                    <p id="eventDate" class="mt-1 text-[16px] font-bold">Date not selected</p>
+                  </div>
+                </div>
+                <p id="eventTime" class="text-[14px] muted">Time not selected</p>
+                <p id="eventTimezone" class="mt-2 text-[12px] font-semibold text-[#91600A]">Timezone will be confirmed</p>
+              </div>
+              <div class="rounded-xl bg-[#EEF3FF] p-4">
+                <div class="mb-3 flex items-center gap-3">
+                  <span class="grid h-9 w-9 place-items-center rounded-lg bg-white text-lg text-eventra">⌖</span>
+                  <div>
+                    <p class="text-[12px] font-bold uppercase tracking-wide text-[#69758B]">Physical / Online Venue</p>
+                    <p id="venueName" class="mt-1 text-[16px] font-bold">Venue not added</p>
+                  </div>
+                </div>
+                <p id="venueAddress" class="text-[14px] leading-relaxed muted">Venue address will appear here.</p>
+                <p id="venueExtra" class="mt-2 text-[12px] font-semibold text-eventra"></p>
+              </div>
+            </div>
+          </section>
+
+          <!-- TICKETING -->
+          <section class="card p-4 sm:p-5">
+            <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
+              <div class="section-heading">
+                <div class="section-icon">▤</div>
+                <div>
+                  <h2 class="text-[18px] font-bold">3. Ticketing &amp; Pricing Breakdown</h2>
+                  <p id="ticketSummary" class="mt-1 text-[14px] muted">Review your ticket tiers, quantities, and prices</p>
+                </div>
+              </div>
+              <button class="action-btn secondary-btn !min-h-[36px] !px-3 !py-2" data-edit-step="3">✎ Edit Tickets</button>
+            </div>
+
+            <div id="ticketList" class="space-y-3"></div>
+
+            <div class="mt-4 rounded-xl bg-[#E5EDFF] p-4">
+              <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <p id="payoutName" class="font-bold">Payout Account</p>
+                  <p id="payoutDetails" class="mt-1 text-[13px] muted">Payout details will appear here if provided.</p>
+                </div>
+                <span id="payoutStatus" class="inline-flex w-fit rounded-full bg-white px-3 py-1 text-[12px] font-bold text-[#52627A]">Payout status not verified</span>
+              </div>
+              <div class="mt-3 border-t border-[#D5E0F7] pt-3 text-[13px]">
+                <div class="flex justify-between gap-3">
+                  <span class="muted">Platform fee</span>
+                  <span id="platformFee" class="font-semibold">Confirm in payout settings</span>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- PUBLISH MODE -->
+          <section class="card p-4 sm:p-5">
+            <div class="section-heading mb-4">
+              <div class="section-icon">↥</div>
+              <div>
+                <h2 class="text-[18px] font-bold">4. Select Publishing Mode</h2>
+                <p class="mt-1 text-[14px] muted">Control how and when tickets become accessible to the public</p>
+              </div>
+            </div>
+
+            <div class="grid gap-3 md:grid-cols-3">
+              <button type="button" class="mode-option selected" data-mode="immediate" aria-pressed="true">
+                <div class="mb-3 flex items-center justify-between gap-2">
+                  <span class="rounded-full bg-eventra px-2.5 py-1 text-[11px] font-bold uppercase text-white">Recommended</span>
+                  <span class="mode-radio grid h-4 w-4 place-items-center rounded-full border-2 border-eventra bg-eventra text-[9px] text-white">●</span>
+                </div>
+                <p class="text-[17px] font-bold">ϟ Publish Immediately</p>
+                <p class="mt-2 text-[13px] leading-relaxed muted">Your event goes live after the platform confirms successful publishing.</p>
+              </button>
+
+              <button type="button" class="mode-option" data-mode="scheduled" aria-pressed="false">
+                <div class="mb-3 flex items-center justify-between gap-2">
+                  <span class="rounded-full bg-[#E9EEF8] px-2.5 py-1 text-[11px] font-bold uppercase text-[#5F6B81]">Automation</span>
+                  <span class="mode-radio grid h-4 w-4 place-items-center rounded-full border-2 border-[#D8E0EE]"></span>
+                </div>
+                <p class="text-[17px] font-bold">◷ Schedule Publish</p>
+                <p class="mt-2 text-[13px] leading-relaxed muted">Choose a future date and time for your event to become public.</p>
+              </button>
+
+              <button type="button" class="mode-option" data-mode="private" aria-pressed="false">
+                <div class="mb-3 flex items-center justify-between gap-2">
+                  <span class="rounded-full bg-[#E9EEF8] px-2.5 py-1 text-[11px] font-bold uppercase text-[#5F6B81]">Private</span>
+                  <span class="mode-radio grid h-4 w-4 place-items-center rounded-full border-2 border-[#D8E0EE]"></span>
+                </div>
+                <p class="text-[17px] font-bold">♙ Unlisted / Secret</p>
+                <p class="mt-2 text-[13px] leading-relaxed muted">Keep the event out of public discovery and share its link privately.</p>
+              </button>
+            </div>
+
+            <div id="scheduleFields" class="mt-4 hidden rounded-xl border border-[#E5EAF3] bg-[#FAFBFF] p-4">
+              <label for="publishAt" class="mb-2 block text-[14px] font-semibold">Schedule publishing date and time</label>
+              <input id="publishAt" type="datetime-local" class="w-full rounded-xl border border-[#D8E1EF] bg-white px-3 py-3 text-[15px] outline-none focus:border-eventra focus:ring-2 focus:ring-purple-100">
+              <p class="mt-2 text-[13px] muted">Choose a future time. Scheduled publishing must be supported by the connected backend to go live automatically.</p>
+            </div>
+          </section>
+        </div>
+
+        <!-- RIGHT COLUMN -->
+        <aside class="min-w-0 space-y-5">
+          <!-- LIVE PREVIEW -->
+          <section class="card p-4">
+            <div class="mb-3 flex items-center justify-between gap-2">
+              <p class="text-[12px] font-bold uppercase tracking-wide text-[#667188]">Live Attendee App Card</p>
+              <span class="flex items-center gap-1.5 text-[12px] font-semibold text-eventra"><span class="h-2 w-2 rounded-full bg-eventra"></span> Preview</span>
+            </div>
+            <div class="overflow-hidden rounded-2xl border border-[#EDF0F6] bg-white shadow-lg">
+              <div class="relative p-3">
+                <img id="attendeeImage" class="event-banner" alt="Attendee event card image" src="">
+                <span class="absolute left-5 top-5 rounded-full bg-white/95 px-2 py-1 text-[11px] font-bold text-[#875800]">◉ Selling Fast</span>
+                <button id="bookmarkBtn" class="absolute right-5 top-5 grid h-8 w-8 place-items-center rounded-full bg-white text-lg shadow" aria-label="Save preview event">♧</button>
+                <span id="previewDateOverlay" class="absolute bottom-5 left-5 rounded-md bg-[#0A1D33]/80 px-2 py-1 text-[12px] font-semibold text-white">Event date</span>
+              </div>
+              <div class="p-4">
+                <p id="previewLocation" class="mb-2 text-[13px] font-medium text-eventra">⌖ Event venue</p>
+                <h3 id="previewEventName" class="text-[18px] font-bold leading-tight">Your Event Name</h3>
+                <p id="previewDescription" class="mt-2 line-clamp-3 text-[14px] leading-relaxed muted">Your event description will appear here.</p>
+                <div class="mt-4 flex items-center justify-between gap-3 border-t border-slate-100 pt-3">
+                  <div class="flex min-w-0 items-center gap-2">
+                    <span id="organizerAvatar" class="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-eventra text-[12px] font-bold text-white">A</span>
+                    <span id="previewOrganizer" class="truncate text-[12px] font-semibold">Apex Live Events</span>
+                  </div>
+                  <div class="text-right">
+                    <p class="text-[12px] muted">From</p>
+                    <p id="previewPrice" class="text-[18px] font-extrabold text-eventra">Price TBD</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <p class="mt-3 text-center text-[13px] leading-relaxed muted">This preview reflects the information currently saved in your event draft.</p>
+          </section>
+
+          <!-- READINESS -->
+          <section class="card p-4 sm:p-5">
+            <div class="mb-4 flex items-center justify-between gap-2">
+              <h2 class="text-[17px] font-bold">Launch Readiness</h2>
+              <span id="readinessBadge" class="rounded-full bg-[#E9EFFF] px-2.5 py-1 text-[12px] font-bold text-[#5C35D8]">Review needed</span>
+            </div>
+            <div id="readinessList" class="space-y-4"></div>
+            <p id="readinessMessage" class="mt-4 rounded-xl bg-[#F5F7FC] p-3 text-[13px] leading-relaxed muted">Review the required event details before publishing.</p>
+          </section>
+
+          <!-- READY PANEL -->
+          <section class="overflow-hidden rounded-2xl bg-gradient-to-br from-[#6D28FF] to-[#4C10D8] p-5 text-white shadow-lg">
+            <div class="mb-4 flex items-center gap-3">
+              <span class="grid h-11 w-11 place-items-center rounded-xl bg-white/15 text-2xl">♢</span>
+              <div>
+                <h2 id="launchPanelTitle" class="text-[18px] font-bold">Ready to Review</h2>
+                <p class="mt-1 text-[12px] font-semibold uppercase tracking-wide text-purple-100">Eventra Organizer</p>
+              </div>
+            </div>
+            <p id="launchPanelText" class="text-[14px] leading-relaxed text-purple-100">Check the details on this page. Save a draft if you need to make changes before publishing.</p>
+            <button id="publishNowBtn" class="action-btn mt-5 w-full bg-white text-eventra hover:bg-purple-50">🚀 Publish Event Now</button>
+            <button id="saveDraftBtn" class="action-btn mt-2 w-full bg-white/15 text-white hover:bg-white/25">Save as Draft &amp; Exit</button>
+          </section>
+        </aside>
+      </div>
+    </main>
+
+    <!-- STICKY FOOTER -->
+    <footer class="publish-footer">
+      <div class="publish-footer-inner content-max flex items-center justify-between gap-4 px-4 py-3 sm:px-6 lg:px-8">
+        <button id="backBtn" class="action-btn secondary-btn">← <span>Back: Tickets &amp; Pricing</span></button>
+        <div class="publish-footer-actions flex items-center gap-2">
+          <button id="footerSaveBtn" class="action-btn secondary-btn">Save Draft</button>
+          <button id="footerPublishBtn" class="action-btn primary-btn">Publish Event Now <span>↗</span></button>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <!-- PREVIEW MODAL -->
+  <div id="previewModal" class="fixed inset-0 z-[80] hidden items-center justify-center bg-[#081426]/60 p-4" role="dialog" aria-modal="true" aria-labelledby="previewModalTitle">
+    <div class="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-white p-5 shadow-2xl sm:p-6">
+      <div class="mb-4 flex items-center justify-between gap-3">
+        <h2 id="previewModalTitle" class="text-[20px] font-bold">Attendee Preview</h2>
+        <button id="closePreviewBtn" class="grid h-9 w-9 place-items-center rounded-lg bg-pale text-lg" aria-label="Close preview">×</button>
+      </div>
+      <p class="mb-4 text-[14px] muted">This is a preview of the event information attendees may see. It is not yet published.</p>
+      <img id="modalImage" class="event-banner mb-4" alt="Event preview">
+      <h3 id="modalEventName" class="text-[22px] font-bold"></h3>
+      <p id="modalDateLocation" class="mt-2 text-[14px] muted"></p>
+      <p id="modalDescription" class="mt-3 text-[15px] leading-relaxed"></p>
+      <p id="modalPrice" class="mt-4 text-[20px] font-extrabold text-eventra"></p>
+      <button id="closePreviewFooterBtn" class="action-btn primary-btn mt-5 w-full">Close Preview</button>
+    </div>
+  </div>
+
+  <!-- GUIDELINES MODAL -->
+  <div id="guidelinesModal" class="fixed inset-0 z-[80] hidden items-center justify-center bg-[#081426]/60 p-4" role="dialog" aria-modal="true" aria-labelledby="guidelinesTitle">
+    <div class="max-h-[85vh] w-full max-w-xl overflow-y-auto rounded-2xl bg-white p-5 shadow-2xl sm:p-6">
+      <div class="mb-4 flex items-center justify-between">
+        <h2 id="guidelinesTitle" class="text-[20px] font-bold">Organizer Guidelines</h2>
+        <button id="closeGuidelinesBtn" class="grid h-9 w-9 place-items-center rounded-lg bg-pale text-lg" aria-label="Close guidelines">×</button>
+      </div>
+      <ul class="space-y-3 text-[15px] leading-relaxed muted">
+        <li>✓ Use an accurate event name, category, description, date, and venue.</li>
+        <li>✓ Check each ticket price, quantity, and total capacity before publishing.</li>
+        <li>✓ Ensure your payout information is correct before accepting paid registrations.</li>
+        <li>✓ Choose public, scheduled, or private publishing according to your launch plan.</li>
+        <li>✓ Publishing is confirmed only after the server accepts the event. Saving a draft does not publish it.</li>
+      </ul>
+      <button id="closeGuidelinesFooterBtn" class="action-btn primary-btn mt-5 w-full">Understood</button>
+    </div>
+  </div>
+
+  <script src="./script.js"></script>
+</body>
+</html>
