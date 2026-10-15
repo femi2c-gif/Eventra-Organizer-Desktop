@@ -815,31 +815,34 @@ if (passwordInput) {
 
 
 // ============================================================
-// LOAD REMEMBERED EMAIL
+// LOAD EMAIL FROM THE CURRENT SIGN-UP FLOW ONLY
+// Never restore an old login email from the Remember Me setting.
 // ============================================================
 
-const rememberedEmail =
-    localStorage.getItem(
-        "eventra_email"
-    );
+const signInParams = new URLSearchParams(window.location.search);
+const signupEmail = (
+    signInParams.get("email") ||
+    localStorage.getItem("eventra_registration_email") ||
+    ""
+).trim();
 
-
-if (rememberedEmail) {
-
-    emailInput.value =
-        rememberedEmail;
-
-    rememberMe.checked =
-        true;
-
+if (emailInput) {
+    emailInput.value = signupEmail;
 }
 
+if (passwordInput) {
+    passwordInput.value = "";
+}
+
+if (rememberMe) {
+    rememberMe.checked = false;
+}
 
 // ============================================================
 // REMEMBER ME
 // ============================================================
 
-rememberMe.addEventListener(
+if (rememberMe) rememberMe.addEventListener(
     "change",
     function () {
 

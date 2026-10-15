@@ -402,7 +402,28 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
+    function initializeEmptyDashboard() {
+        setEl("statTotalEvents", "0");
+        setEl("statTicketsSold", "0");
+        setEl("statRevenue", "₦0");
+        setEl("statAttendanceRate", "0%");
+        setEl("statChangeEvents", "No events yet");
+        setEl("statChangeTickets", "No ticket sales yet");
+        setEl("statChangeRevenue", "No revenue yet");
+        renderAttendanceDonut(0, 0);
+        setEl("yAxisMax", "₦0");
+        setEl("yAxis75", "₦0");
+        setEl("yAxis50", "₦0");
+        setEl("yAxis25", "₦0");
+        const bars = el("dashboardChartBars");
+        if (bars) bars.querySelectorAll(".chart-bar").forEach(bar => bar.remove());
+        const labels = el("dashboardChartLabels");
+        if (labels) labels.innerHTML = "";
+        renderEvents([]);
+    }
+
     async function loadDashboard() {
+        initializeEmptyDashboard();
         const token = getToken();
         if (!token) return;
 
