@@ -815,30 +815,12 @@ if (passwordInput) {
 
 
 // ============================================================
-// LOAD EMAIL FROM THE CURRENT SIGN-UP FLOW ONLY
-// Never restore an old login email from the Remember Me setting.
-// ============================================================
+// SIGN-IN FIELDS START EMPTY ON A FRESH PAGE LOAD.
+// Do not restore an email from signup or a previous session.
+if (emailInput) emailInput.value = "";
+if (passwordInput) passwordInput.value = "";
+if (rememberMe) rememberMe.checked = false;
 
-const signInParams = new URLSearchParams(window.location.search);
-const signupEmail = (
-    signInParams.get("email") ||
-    localStorage.getItem("eventra_registration_email") ||
-    ""
-).trim();
-
-if (emailInput) {
-    emailInput.value = signupEmail;
-}
-
-if (passwordInput) {
-    passwordInput.value = "";
-}
-
-if (rememberMe) {
-    rememberMe.checked = false;
-}
-
-// ============================================================
 // REMEMBER ME
 // ============================================================
 

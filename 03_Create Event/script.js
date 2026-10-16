@@ -61,7 +61,7 @@ function updateCounters() {
 
   if (eventName && previewName) {
     previewName.textContent =
-      eventName.value.trim() || "Tech Conference 2026";
+      eventName.value.trim() || "Your event name will appear here";
   }
 }
 
@@ -182,60 +182,27 @@ function renderTag(value) {
 ===================================================== */
 
 function restoreDraft() {
+  // A new visit to Create Event must start with a clean form.
+  // Remove legacy/sample drafts that could populate the form with another event.
   try {
-    const stored = JSON.parse(
-      localStorage.getItem(STORAGE_KEY) || "null"
-    );
-
-    if (!stored) {
-      updateCounters();
-      return;
-    }
-
-    if (eventName && typeof stored.eventName === "string") {
-      eventName.value = stored.eventName;
-    }
-
-    if (category && stored.category) {
-      category.value = stored.category;
-    }
-
-    if (
-      description &&
-      typeof stored.description === "string"
-    ) {
-      description.value = stored.description;
-    }
-
-    if (tagInput && tagText && Array.isArray(stored.tags)) {
-      tagInput.querySelectorAll(".tag").forEach(tag => tag.remove());
-
-      stored.tags.forEach(tag => renderTag(tag));
-    }
-
-    if (stored.imageData && previewImage) {
-      currentImageData = stored.imageData;
-      previewImage.src = stored.imageData;
-      previewImage.style.display = "block";
-    }
-
-    if (stored.updatedAt && autosave) {
-      const savedDate = new Date(stored.updatedAt);
-
-      if (!Number.isNaN(savedDate.getTime())) {
-        const time = savedDate.toLocaleTimeString([], {
-          hour: "2-digit",
-          minute: "2-digit"
-        });
-
-        autosave.textContent = `Draft Auto-Saved at ${time}`;
-      }
-    }
-
-    updateCounters();
+    localStorage.removeItem(STORAGE_KEY);
   } catch (error) {
-    console.warn("Could not restore draft:", error);
+    console.warn("Could not clear the previous event draft:", error);
   }
+
+  if (eventName) eventName.value = "";
+  if (category) category.value = "";
+  if (description) description.value = "";
+  if (tagInput) tagInput.querySelectorAll(".tag").forEach(tag => tag.remove());
+
+  currentImageData = null;
+  if (previewImage) {
+    previewImage.removeAttribute("src");
+    previewImage.style.display = "none";
+  }
+  if (imageInput) imageInput.value = "";
+  if (autosave) autosave.textContent = "No draft saved";
+  updateCounters();
 }
 
 /* =====================================================

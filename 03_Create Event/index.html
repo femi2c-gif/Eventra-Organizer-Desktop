@@ -1236,7 +1236,7 @@
                     id="eventName"
                     type="text"
                     maxlength="80"
-                    value="Tech Conference 2026"
+                    value=""
                     autocomplete="off"
                     required
                   >
@@ -1251,6 +1251,7 @@
                 </label>
 
                 <select id="category" required>
+                  <option value="" selected disabled>Select a category</option>
                   <option value="Technology">Technology</option>
                   <option value="Music">Music</option>
                   <option value="Business">Business</option>
@@ -1272,7 +1273,7 @@
                   id="description"
                   maxlength="300"
                   required
-                >A conference for innovators, builders and changemakers featuring premier tech leaders across Nigeria and Africa.</textarea>
+                ></textarea>
               </div>
             </div>
 
@@ -1281,8 +1282,8 @@
               <div class="preview">
                 <img
                   id="previewImage"
-                  src="./Tech Conference 2026.png"
                   alt="Event cover preview"
+                  style="display:none"
                   onerror="this.style.display='none'"
                 >
 
@@ -1292,7 +1293,7 @@
                     <span class="preview-size" id="imageSize">Cover image</span>
                   </div>
 
-                  <div class="preview-name" id="previewName">Tech Conference 2026</div>
+                  <div class="preview-name" id="previewName">Your event name will appear here</div>
                   <div class="preview-location">Event cover preview</div>
                 </div>
               </div>

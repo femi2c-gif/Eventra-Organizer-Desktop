@@ -52,6 +52,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (newEventButton) {
         newEventButton.addEventListener("click", () => {
+            [
+              "eventra_organizer_create_event_draft", "eventra_create_event_draft",
+              "eventra_event_draft", "eventra_create_event", "eventra_event_data",
+              "eventra_step1_draft", "eventra_step2_draft", "eventra_step3_draft",
+              "eventra_step1", "eventra_step2", "eventra_step3", "eventra_step4",
+              "eventra_published_event", "eventra_created_event", "eventra_selected_event",
+              "eventra_selected_event_id", "createEventDraft"
+            ].forEach(key => { localStorage.removeItem(key); sessionStorage.removeItem(key); });
             window.location.href = "../03_Create Event/index.html";
         });
     }
@@ -278,7 +286,42 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function formatEventDate(dateStr) {
         if (!dateStr) return "";
-        return new Date(dateStr).toLocaleDateString("en-NG", { day: "numeric", month: "short", year: "numeric" });
+        // Date-only API values must be parsed as local calendar dates, not UTC timestamps.
+        const match = String(dateStr).match(/^(\\d{4})-(\\d{2})-(\\d{2})/);
+        const date = match
+            ? new Date(Number(match[1]), Number(match[2]) - 1, Number(match[3]), 12)
+            : new Date(dateStr);
+        if (Number.isNaN(date.getTime())) return String(dateStr);
+        return date.toLocaleDateString("en-NG", { day: "numeric", month: "short", year: "numeric" });
+    }
+
+    function extractEvents(payload) {
+        if (Array.isArray(payload)) return payload;
+        // The API has returned event arrays under different wrappers across endpoints.
+        const candidates = [
+            payload?.events,
+            payload?.data?.events,
+            payload?.results,
+            payload?.data?.results,
+            payload?.data?.data,
+            payload?.data,
+            payload?.items,
+            payload?.data?.items
+        ];
+        for (const candidate of candidates) {
+            if (Array.isArray(candidate)) return candidate;
+        }
+        return [];
+    }
+
+    async function fetchEventList(url, headers) {
+        const response = await fetch(url, {
+            headers,
+            cache: "no-store"
+        });
+        if (!response.ok) return { ok: false, events: [] };
+        const payload = await response.json();
+        return { ok: true, events: extractEvents(payload), payload };
     }
 
     function statusBadge(status) {
@@ -430,23 +473,55 @@ document.addEventListener("DOMContentLoaded", () => {
         const headers = { "Authorization": `Bearer ${token}`, "Content-Type": "application/json" };
 
         try {
-            const [eventsRes, analyticsRes] = await Promise.all([
-                fetch(`${BASE}/organizer/events`, { headers }),
-                fetch(`${BASE}/organizer/analytics`, { headers })
+            const [organizerEventsResult, analyticsRes] = await Promise.all([
+                fetchEventList(`${BASE}/organizer/events`, headers),
+                fetch(`${BASE}/organizer/analytics`, { headers, cache: "no-store" })
             ]);
 
-            if (eventsRes.ok) {
-                const events = (await eventsRes.json()).data || [];
-                setEl("statTotalEvents", events.length);
-                const sold = events.reduce((sum, ev) =>
-                    sum + (ev.TicketTypes || []).reduce((s, t) => s + ((t.quantity || 0) - (t.available || 0)), 0), 0);
-                setEl("statTicketsSold", sold.toLocaleString("en-NG"));
-                renderEvents(events);
-                filterEvents();
+            let events = organizerEventsResult.events;
+            // Some deployed backend versions expose the authenticated organizer's event
+            // list through /events rather than /organizer/events. Try that endpoint when
+            // the first route returns an empty list, so a newly created event is not missed.
+            if (!events.length) {
+                try {
+                    const fallback = await fetchEventList(`${BASE}/events?page=1&limit=100`, headers);
+                    if (fallback.ok && fallback.events.length) {
+                        const userRaw = localStorage.getItem("eventra_user") ||
+                                         sessionStorage.getItem("eventra_user");
+                        let user = {};
+                        try { user = userRaw ? JSON.parse(userRaw) : {}; } catch (_) {}
+                        const organizerId = user.id || user.user_id || user.organizer_id;
+                        const owned = organizerId
+                            ? fallback.events.filter(ev => {
+                                const ownerId = ev.organizer_id || ev.organizerId ||
+                                                ev.user_id || ev.userId ||
+                                                ev.organizer?.id || ev.user?.id;
+                                return ownerId == null || String(ownerId) === String(organizerId);
+                              })
+                            : fallback.events;
+                        events = owned;
+                    }
+                } catch (fallbackError) {
+                    console.warn("Fallback event list request failed:", fallbackError);
+                }
             }
 
+            setEl("statTotalEvents", events.length);
+            const sold = events.reduce((sum, ev) => {
+                const tiers = ev.TicketTypes || ev.ticket_types || ev.ticketTypes || [];
+                return sum + tiers.reduce((subtotal, tier) => {
+                    const quantity = Number(tier.quantity || tier.total_quantity || 0);
+                    const available = Number(tier.available ?? tier.available_quantity ?? quantity);
+                    return subtotal + Math.max(0, quantity - available);
+                }, 0);
+            }, 0);
+            setEl("statTicketsSold", sold.toLocaleString("en-NG"));
+            renderEvents(events);
+            filterEvents();
+
             if (analyticsRes.ok) {
-                const a = (await analyticsRes.json()).data || {};
+                const analyticsPayload = await analyticsRes.json();
+                const a = analyticsPayload?.data || analyticsPayload || {};
                 if (a.total_revenue != null) setEl("statRevenue", formatNaira(a.total_revenue));
                 setEl("statAttendanceRate", (Number(a.conversion_rate) || 0).toFixed(1) + "%");
                 renderChangeIndicator("statChangeRevenue", a.revenue_change ?? null);
